@@ -55,7 +55,7 @@ contract StorageBucketExample {
 
 - As far as I know, the first major protocol to use this pattern in production is the [0x V4 contracts](https://github.com/0xProject/protocol/tree/development/contracts/zero-ex/contracts/src/storage).
 - There is also a newer standard for upgradable contracts called the ["diamond proxy"](https://eips.ethereum.org/EIPS/eip-2535) which leverages storage buckets.
-- The [Standard Proxy Storage Slots Standard](https://eips.ethereum.org/EIPS/eip-1967), which is implemented by many simple proxies in the wild, is a spiritual precursor to this pattern because it explicitly chooses a storage slot to store its implementation address.
+- The [Standard Proxy Storage Slots](https://eips.ethereum.org/EIPS/eip-1967) standard, which is implemented by many simple proxies in the wild, is a spiritual precursor to this pattern because it explicitly chooses a storage slot to store its implementation address.
 
 ## Example
 
