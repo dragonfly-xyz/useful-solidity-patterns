@@ -7,6 +7,8 @@ The code examples herein are meant to be educational. Most have not been audited
 ## Current Examples
 - [Factory Proofs](./examples/factory-proofs)
     - Proving on-chain that a contract was deployed by a trusted deployer.
+- [Explicit Storage Buckets](./examples/explicit-storage-buckets)
+    - Safer, guaranteed non-overlapping storage for upgradeable contracts.
 - Stay tuned for more 😉
 
 ## Installing, Building, Testing
