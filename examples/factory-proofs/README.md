@@ -22,7 +22,7 @@ address(keccak256(abi.encodePacked(
 )))
 ```
 
-So long as you are given (or can derive) the unique salt for `DEPLOYED_CONTRACT`, you can simply perform this hash on-chain to validate that the address in question was deployed by `deployer` and can be trusted-- no storage lookups required!
+So long as you are given (or can derive) the unique salt for an instance of `DEPLOYED_CONTRACT`, you can simply perform this hash on-chain to validate that the address in question was deployed by `deployer` and can be trusted-- no storage lookups required!
 
 ## `CREATE` Proofs
 
