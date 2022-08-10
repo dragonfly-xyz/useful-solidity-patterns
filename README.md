@@ -6,7 +6,7 @@ The code examples herein are meant to be educational. Most have not been audited
 
 ## Current Examples
 - [Factory Proofs](./examples/factory-proofs)
-    - On-chain proofs that a contract was deployed by a trusted deployer.
+    - Proving on-chain that a contract was deployed by a trusted deployer.
 - Stay tuned for more 😉
 
 ## Installing, Building, Testing
