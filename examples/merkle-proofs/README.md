@@ -3,7 +3,7 @@
 - [📜 Example Code](./MerkleProofs.sol)
 - [🐞 Tests](../../test/MerkleProofs.t.sol)
 
-Oftentimes protocols need to verify membership of something to within a known set. Naively you could store a mapping of valid values on-chain as a mapping. This approach has decent efficiency when verifying membership since it only takes a single storage slot read. However, committing that data on-chain can be extremely costly, especially for large sets. Take, for example, an airdrop, where there are typically thousands of eligible recipients. To store 1000 addresses in a mapping would cost upwards of 20M gas!
+Oftentimes protocols need to verify membership of something to within a known set. Naively you could store all valid values on-chain as a mapping. This approach has decent efficiency when verifying membership since it only takes a single storage slot read. However, committing that data on-chain can be extremely costly, especially for large sets. Take, for example, an airdrop, where there are typically thousands of eligible recipients. To store 1000 addresses in a mapping would cost upwards of 20M gas!
 
 ## Leveraging Hashes
 
