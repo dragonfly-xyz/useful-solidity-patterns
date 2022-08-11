@@ -28,7 +28,7 @@ In the simple case, merkle trees are a form of binary tree, where each leaf node
 
 Like our hash-based solution, with merkle proofs we will still store a single hash on-chain to represent the entire set: the root hash of the merkle tree. We will also require certain interactions with our contract to pass in extra data to establish proof something belongs to the set, but thanks to the hierarchical nature of merkle trees, we won't need to be provided with the entire set this time.
 
-To prove something belongs to a merkle tree we just need to be able to derive the merkle root, and check that it matches the one we have stored. We accept the item in question and the hash-value of its tree neighbors as we hash our way up to the merkle root. Since a binary tree has `log2(N)` levels, our proof only has logarithmic complexity scaling.
+To prove something belongs to a merkle tree we just need to be able to derive the merkle root, and check that it matches the one we have stored. We accept the item in question and the hash-value of any tree neighbors we would encounter as we hash our way up to the merkle root. Since a binary tree has `log2(N)` levels, our proof only has logarithmic complexity scaling.
 
 To illustrate, given the merkle tree provided earlier, we can prove `item2` belongs to the merkle tree by deriving the root (`N0`). To do this we only need `item2` and the hash-values of `N1` and `N6`:
 
