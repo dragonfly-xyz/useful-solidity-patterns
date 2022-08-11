@@ -5,10 +5,12 @@ This repo is an ongoing collection of useful and (sometimes) clever solidity pat
 The code examples herein are meant to be educational. Most have not been audited and are not intended to be deployed as-is without an independent security review.
 
 ## Current Examples
-- [Factory Proofs](./examples/factory-proofs)
-    - Proving on-chain that a contract was deployed by a trusted deployer.
 - [Explicit Storage Buckets](./examples/explicit-storage-buckets)
     - Safer, guaranteed non-overlapping storage for upgradeable contracts.
+- [Factory Proofs](./examples/factory-proofs)
+    - Proving on-chain that a contract was deployed by a trusted deployer.
+- [Merkle Proofs](./examples/merkle-proofs)
+    - Storage efficient method of proving membership to a potentially large fixed set.
 - Stay tuned for more 😉
 
 ## Installing, Building, Testing
