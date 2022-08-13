@@ -40,7 +40,10 @@ contract MerkleDrop {
     )
         external
     {
-        require(prove(keccak256(abi.encode(member, claimAmount)), proof), 'bad proof');
+        // Security note: Leaf hashes are inverted to prevent second preimage attacks,
+        // i.e., passing in intermediate node values (subtree hashes) for member and
+        // claimAmount.
+        require(prove(~keccak256(abi.encode(member, claimAmount)), proof), 'bad proof');
         hasClaimed[member] = true;
         member.transfer(claimAmount);
     }
@@ -76,7 +79,8 @@ contract MerkleDropHelper {
         // hashes of each member and claim amount.
         bytes32[] memory nodes = tree[0] = new bytes32[](members.length);
         for (uint256 i = 0; i < members.length; ++i) {
-            nodes[i] = keccak256(abi.encode(members[i], claimAmounts[i]));
+            // Leaf hashes are inverted to prevent second preimage attacks.
+            nodes[i] = ~keccak256(abi.encode(members[i], claimAmounts[i]));
         }
         // Build up subsequent layers until we arrive at the root hash.
         // Each parent node is the hash of the two children below it.

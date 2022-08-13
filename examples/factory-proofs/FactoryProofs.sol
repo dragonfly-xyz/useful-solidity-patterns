@@ -15,14 +15,64 @@ contract FactoryProofs {
         // (number of txs it has executed) when it deployed the contract.
         // For contract deployers, the deploy nonce is 1 + the number of other contracts
         // that contract has deployed (using regular create opcode).
-        bytes memory rlpNonce = rlpEncodeNonce(deployNonce);
-        address expected = address(uint160(uint256(keccak256(abi.encodePacked(
-            bytes1(uint8(0xC0 + 21 + rlpNonce.length)),
-            bytes1(uint8(0x80 + 20)),
-            deployer,
-            rlpNonce
-        )))));
-        return expected == deployed;
+        assembly {
+            mstore(0x02, shl(96, deployer))
+            let rlpNonceLength
+            switch gt(deployNonce, 0xFFFFFF)
+                case 1 { // 4 byte nonce
+                    rlpNonceLength := 5
+                    mstore8(0x00, 0xD8)
+                    mstore8(0x16, 0x84)
+                    mstore(0x17, shl(224, deployNonce))
+                }
+                default {
+                    switch gt(deployNonce, 0xFFFF)
+                        case 1 {
+                            // 3 byte nonce
+                            rlpNonceLength := 4
+                            mstore8(0x16, 0x83)
+                            mstore(0x17, shl(232, deployNonce))
+                        }
+                        default {
+                            switch gt(deployNonce, 0xFF)
+                                case 1 {
+                                    // 2 byte nonce
+                                    rlpNonceLength := 3
+                                    mstore8(0x16, 0x82)
+                                    mstore(0x17, shl(240, deployNonce))
+                                }
+                                default {
+                                    switch gt(deployNonce, 0x7F)
+                                        case 1 {
+                                            // 1 byte nonce >= 0x80
+                                            rlpNonceLength := 2
+                                            mstore8(0x16, 0x81)
+                                            mstore8(0x17, deployNonce)
+                                        }
+                                        default {
+                                            rlpNonceLength := 1
+                                            switch iszero(deployNonce)
+                                                case 1 {
+                                                    // zero nonce
+                                                    mstore8(0x16, 0x80)
+                                                }
+                                                default {
+                                                    // 1 byte nonce < 0x80
+                                                    mstore8(0x16, deployNonce)
+                                                }
+                                        }
+                                }
+                        }
+                }
+            mstore8(0x00, add(0xD5, rlpNonceLength))
+            mstore8(0x01, 0x94)
+            let expected := and(
+                keccak256(0x00, add(0x16, rlpNonceLength)),
+                0xffffffffffffffffffffffffffffffffffffffff
+            )
+            mstore(0x00, eq(expected, deployed))
+            return(0x00, 0x20)
+        }
     }
 
     // Validate that `deployed` was deployed by `deployer` using create2 opcode
@@ -48,43 +98,5 @@ contract FactoryProofs {
             initCodeHash
         )))));
         return expected == deployed;
-    }
-
-    // RLP-encode an (up to) 32-bit number.
-    function rlpEncodeNonce(uint32 nonce)
-        private
-        pure
-        returns (bytes memory rlpNonce)
-    {
-        // See https://github.com/ethereum/wiki/wiki/RLP for RLP encoding rules.
-        if (nonce == 0) {
-            rlpNonce = new bytes(1);
-            rlpNonce[0] = 0x80;
-        } else if (nonce < 0x80) {
-            rlpNonce = new bytes(1);
-            rlpNonce[0] = bytes1(uint8(nonce));
-        } else if (nonce <= 0xFF) {
-            rlpNonce = new bytes(2);
-            rlpNonce[0] = 0x81;
-            rlpNonce[1] = bytes1(uint8(nonce));
-        } else if (nonce <= 0xFFFF) {
-            rlpNonce = new bytes(3);
-            rlpNonce[0] = 0x82;
-            rlpNonce[1] = bytes1(uint8((nonce & 0xFF00) >> 8));
-            rlpNonce[2] = bytes1(uint8(nonce));
-        } else if (nonce <= 0xFFFFFF) {
-            rlpNonce = new bytes(4);
-            rlpNonce[0] = 0x83;
-            rlpNonce[1] = bytes1(uint8((nonce & 0xFF0000) >> 16));
-            rlpNonce[2] = bytes1(uint8((nonce & 0xFF00) >> 8));
-            rlpNonce[3] = bytes1(uint8(nonce));
-        } else {
-            rlpNonce = new bytes(5);
-            rlpNonce[0] = 0x84;
-            rlpNonce[1] = bytes1(uint8((nonce & 0xFF000000) >> 24));
-            rlpNonce[2] = bytes1(uint8((nonce & 0xFF0000) >> 16));
-            rlpNonce[3] = bytes1(uint8((nonce & 0xFF00) >> 8));
-            rlpNonce[4] = bytes1(uint8(nonce));
-        }
     }
 }

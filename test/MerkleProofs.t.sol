@@ -159,7 +159,7 @@ contract MerkleProofsTest is Test, TestUtils {
         uint256 memberIndex = _randomUint256() % members.length;
         bytes32[] memory proof = helper.createProof(memberIndex, tree);
         assertEq(proof.length, tree.length - 1, 'wrong proof length');
-        bytes32 leafHash = keccak256(abi.encode(
+        bytes32 leafHash = ~keccak256(abi.encode(
             members[memberIndex],
             claimAmounts[memberIndex]
         ));
@@ -177,7 +177,7 @@ contract MerkleProofsTest is Test, TestUtils {
             MerkleDrop drop
         ) = _createDrop(1 + _randomUint256() % 256);
         uint256 memberIndex = _randomUint256() % members.length;
-        bytes32 leafHash = keccak256(abi.encode(
+        bytes32 leafHash = ~keccak256(abi.encode(
             members[memberIndex],
             claimAmounts[memberIndex]
         ));
@@ -193,7 +193,7 @@ contract MerkleProofsTest is Test, TestUtils {
             MerkleDrop drop
         ) = _createDrop(1 + _randomUint256() % 256);
         uint256 memberIndex = _randomUint256() % members.length;
-        bytes32 leafHash = keccak256(abi.encode(
+        bytes32 leafHash = ~keccak256(abi.encode(
             members[memberIndex],
             claimAmounts[memberIndex] + 1
         ));
