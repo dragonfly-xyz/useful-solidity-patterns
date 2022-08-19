@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "outDir": "js",
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "sourceMap": true,
+        "target": "es2020",
+        "downlevelIteration": true
+    },
+    "include": ["/**/*.ts"],
+    "exclude": ["node_modules"]
+}

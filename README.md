@@ -5,6 +5,8 @@ This repo is an ongoing collection of useful and (sometimes) clever solidity pat
 The code examples herein are meant to be educational. Most have not been audited and are not intended to be deployed as-is without an independent security review.
 
 ## Current Examples
+- [`eth_call` Tricks](./examples/eth_call-tricks)
+    - Perform fast, complex queries of on-chain data and simulations with zero deployment cost using `eth_call`.
 - [Explicit Storage Buckets](./examples/explicit-storage-buckets)
     - Safer, guaranteed non-overlapping storage for upgradeable contracts.
 - [Factory Proofs](./examples/factory-proofs)
