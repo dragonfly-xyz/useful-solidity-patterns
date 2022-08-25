@@ -13,6 +13,8 @@ The code examples herein are meant to be educational. Most have not been audited
     - Proving on-chain that a contract was deployed by a trusted deployer.
 - [Merkle Proofs](./examples/merkle-proofs)
     - Storage efficient method of proving membership to a potentially large fixed set.
+- [Off-Chain Storage](./examples/off-chain-storage)
+    - Reduce gas costs tremendously by moving contract state off-chain.
 - Stay tuned for more 😉
 
 ## Installing, Building, Testing
