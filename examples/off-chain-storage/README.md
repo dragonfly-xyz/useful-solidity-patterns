@@ -3,13 +3,13 @@
 - [📜 Example Code](./OffChainAuction.sol)
 - [🐞 Tests](../../test/OffChainAuction.t.sol)
 
-Storage operations often make up the bulk of smart contract execution cost. Even trivial protocols typically need to track multiple states between interactions, which naively requires writing and reading many times to on-chain/contract storage. As a general rule of thumb in EVM land, writing a non-zero value to an empty (zero) slot costs 20k, updating it costs 5k, and reading it can cost between 100-2.1k (thanks, [EIP-2929](https://eips.ethereum.org/EIPS/eip-2929)), so you can see how quickly these things can add up.
+Storage operations often make up the bulk of smart contract execution costs. Even trivial protocols typically need to track multiple states between interactions, which naively requires writing and reading many times to on-chain/contract storage. As a general rule of thumb in EVM land, writing a non-zero value to an empty (zero) slot costs 20k, updating it costs 5k, and reading it can cost between 100-2.1k (thanks, [EIP-2929](https://eips.ethereum.org/EIPS/eip-2929)), so you can see how quickly these things can add up.
 
 There are many gas mitigation strategies around on-chain storage, but there's no denying that the single, most effective way to reduce storage costs is simply not to store things on-chain at all. 😉
 
 ## Off-Chain Storage Basics
 
-The idea behind off-chain storage is to actually to take a hybrid approach, where we only store *the hash* of our contract's state on-chain, track the full state off chain, and pass back it in when interacting with our contract. So instead of the usual way of declaring each storage variable inline, we instead:
+The idea behind off-chain storage is actually to take a hybrid approach, where we only store *the hash* of our contract's state on-chain, track the full state off-chain, and pass back it in when interacting with our contract. So instead of the usual way of declaring each storage variable inline, we instead:
 
 1. Declare state fields in a "state object" `struct` instead.
 2. Store the hash of the state object on-chain.
@@ -62,10 +62,10 @@ Had these storage variables been stored entirely on-chain, to initialize them al
 While there are massive efficiency gains possible from this approach, relying on off-chain data has some notable disadvantages and concerns.
 
 #### Infra Burden
-Since your contract no longer holds the full state variables in storage, your dapp will need some kind of off-chain infrastructure to fetch the full state objects for contract interactions. Fortunately, because we emit events containing the full object, it's fairly trivial to use something like `eth_getLogs` on an archive node (e.g., alchemy) to grab the latest state object. Without access to an archive node, you can spin up a service that consumes events as they happen and caches the objects.
+Since your contract no longer holds the full state variables in storage, your dapp will need some kind of off-chain infrastructure to fetch the full state objects for contract interactions. Fortunately, because we emit events containing the full object, it's fairly trivial to use something like `eth_getLogs` on an archive node (e.g., Alchemy) to grab the latest state object. Without access to an archive node, you can spin up a service that consumes events as they happen and caches the objects.
 
 #### Composability
-Other contracts can't build on top of your protocol from a purely on-chain context. The initiating EOA will need to provide the contract with valid off-chain state object(s). Depending on where in the funnel your protocol sits, this pattern might not be as disruptive as it sounds, since many protocols (particularly in defi) already rely on an off-chain component for efficient usage (e.g., uniswap pool routing).
+Other contracts can't build on top of your protocol from a purely on-chain context. The initiating EOA will need to provide the contract with valid off-chain state object(s). Depending on where in the funnel your protocol sits, this pattern might not be as disruptive as it sounds, since many protocols (particularly in defi) already rely on an off-chain component for efficient usage (e.g., Uniswap pool routing).
 
 #### TX Collisions / Stale State
 If interactions needing the same state objects are frequent enough, it's possible that two pending transactions will attempt to update/interact with the same state object, causing the second one to fail because the state hash will no longer match what is stored. One way to mitigate against this is to break up your state objects into groups that frequently change together so unrelated interactions don't impact each other's state.
