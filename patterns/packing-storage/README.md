@@ -83,7 +83,7 @@ contract ContractB is ContractA {
 
 ### Inspecting Assigned Slots And Offsets
 
-Most people won't need to, but you can uncover the slot and offset values associated with a storage varabile for use in your code using assembly:
+Most people won't need to, but you can uncover the slot and offset values associated with a storage variable for use in your code using assembly:
 ```solidity
 uint64 _u64;
 address _a160;
