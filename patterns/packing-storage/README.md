@@ -7,7 +7,7 @@ Contract storage in the EVM is built around the concept of "slots," where each s
 
 ![slot storage](./slot-storage.png)
 
-As a single operation, reading and writing to a storage slot is probably the most expensive thing your contract does regularly, with a single read costing up to 2,100 gas and single write costing up to 20,000 gas (on mainnet). Most contracts will need to read from and write to many slots at a time, meaning the costs will easily add up.
+As a single operation, reading and writing to a storage slot is probably the most expensive thing your contract does regularly, with a single read costing up to 2,100 gas and single write costing up to 20,000 gas (on mainnet). Non-trivial contracts will usually need to read from and write to many storage variables in a single transaction, meaning the costs can quickly add up.
 
 ## Manual Slot Packing
 
