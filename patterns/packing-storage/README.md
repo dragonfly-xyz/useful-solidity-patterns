@@ -3,7 +3,7 @@
 - [📜 Example Code](./PackedStoragePayouts.sol)
 - [🐞 Tests](../../test/PackedStoragePayouts.t.sol)
 
-Contract storage in the EVM is built around the concept of "slots," where each slot is 32 bytes wide and can be indexed by any 256-bit number. In the simple case, the compiler will essentially assign storage variables to successive slots as you declare them in your contracts.
+Contract storage in the EVM is built around the concept of "slots," where each slot is 32 bytes wide and can be indexed by any 256-bit number. In the simple case, the compiler will assign storage variables to successive slots as you declare them in your contracts.
 
 ![slot storage](./slot-storage.png)
 
