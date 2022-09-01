@@ -1,20 +1,22 @@
 # useful-solidity-patterns
 ---
-This repo is an ongoing collection of useful and (sometimes) clever solidity patterns, many of which are used in the wild, ranging from basic to advanced, demonstrated with concise examples. I ([@merklejerk](https://github.com/merklejerk)) will be adding new patterns daily-weekly but contributions are absolutely welcome!
+This repo is an ongoing collection of useful (and sometimes clever) solidity/EVM patterns, most of which are used in the wild, ranging from basic to advanced, demonstrated with concise, working examples and tests. I ([@merklejerk](https://github.com/merklejerk)) will be adding new patterns weekly but contributions are absolutely welcome!
 
 The code examples herein are meant to be educational. Most have not been audited and are not intended to be deployed as-is without an independent security review.
 
-## Current Examples
-- [`eth_call` Tricks](./examples/eth_call-tricks)
+## [Solidity Patterns](./patterns)
+- [`eth_call` Tricks](./patterns/eth_call-tricks)
     - Perform fast, complex queries of on-chain data and simulations with zero deployment cost using `eth_call`.
-- [Explicit Storage Buckets](./examples/explicit-storage-buckets)
+- [Explicit Storage Buckets](./patterns/explicit-storage-buckets)
     - Safer, guaranteed non-overlapping storage for upgradeable contracts.
-- [Factory Proofs](./examples/factory-proofs)
+- [Factory Proofs](./patterns/factory-proofs)
     - Proving on-chain that a contract was deployed by a trusted deployer.
-- [Merkle Proofs](./examples/merkle-proofs)
+- [Merkle Proofs](./patterns/merkle-proofs)
     - Storage efficient method of proving membership to a potentially large fixed set.
-- [Off-Chain Storage](./examples/off-chain-storage)
+- [Off-Chain Storage](./patterns/off-chain-storage)
     - Reduce gas costs tremendously by moving contract state off-chain.
+- [Packing Storage](./patterns/packing-storage)
+    - Arranging your storage variables to minimize expensive storage access.
 - Stay tuned for more 😉
 
 ## Installing, Building, Testing
