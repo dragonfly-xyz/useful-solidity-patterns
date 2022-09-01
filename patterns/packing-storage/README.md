@@ -36,7 +36,7 @@ But you don't need to do this!
 ## Automatic Slot Packing
 The above syntax is pretty unsightly. Fortunately the solidity compiler will do this for you, out of the box, for free!
 
-The compiler will attempt to pack any storage variables that are delcared **adjacent** to each other, so long as they can fit inside 32 bytes. If they cannot fit in the same slot, the next slot is used and packing starts anew from there. Because of this process, each storage variable innately has a "slot" (0 - 2^32-1) and byte "offset" (0-31) property associated with it. When you write solidity that accesses a storage variable, the compiler will generate code that performs the bitwise operations to isolate the variable from the slot, just like when we did it manually.
+The compiler will attempt to pack any storage variables that are delcared **adjacent** to each other, so long as they can fit inside 32 bytes. If they cannot fit in the same slot, the next slot is used and packing starts anew from there. Because of this process, each storage variable innately has a "slot" (0 - 2^32-1) and byte "offset" (0-31) property associated with it. When you write solidity that accesses a storage variable, the compiler will generate code that performs the bitwise operations to isolate the variable from the slot, just like when we did it manually but without having to think about it.
 
 ### What Types Pack?
 
