@@ -2,7 +2,7 @@
 pragma solidity ^0.8.15;
 
 import "forge-std/Test.sol";
-import "../examples/factory-proofs/FactoryProofs.sol";
+import "../patterns/factory-proofs/FactoryProofs.sol";
 import "./TestUtils.sol";
 
 contract FactoryProofsTest is Test, TestUtils {

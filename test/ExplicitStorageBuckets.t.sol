@@ -2,7 +2,7 @@
 pragma solidity ^0.8.15;
 
 import "forge-std/Test.sol";
-import "../examples/explicit-storage-buckets/ExplicitStorageBuckets.sol";
+import "../patterns/explicit-storage-buckets/ExplicitStorageBuckets.sol";
 import "./TestUtils.sol";
 
 contract ExplicitStorageBuckets is Test, TestUtils {

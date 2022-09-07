@@ -4,7 +4,7 @@ pragma solidity ^0.8.15;
 import "forge-std/Test.sol";
 import "solmate/tokens/ERC721.sol";
 
-import "../examples/off-chain-storage/OffChainAuction.sol";
+import "../patterns/off-chain-storage/OffChainAuction.sol";
 import "./TestUtils.sol";
 
 contract OffChainAuctionTest is Test, TestUtils {

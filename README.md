@@ -5,6 +5,8 @@ This repo is an ongoing collection of useful (and sometimes clever) solidity/EVM
 The code examples herein are meant to be educational. Most have not been audited and are not intended to be deployed as-is without an independent security review.
 
 ## [Solidity Patterns](./patterns)
+- [Advanced Error Handling](./patterns/error-handling)
+    - Build resilient contracts that can intercept and react to EVM reverts.
 - [`eth_call` Tricks](./patterns/eth_call-tricks)
     - Perform fast, complex queries of on-chain data and simulations with zero deployment cost using `eth_call`.
 - [Explicit Storage Buckets](./patterns/explicit-storage-buckets)
