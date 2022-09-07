@@ -1,4 +1,4 @@
-[default]
+[profile.default]
 src = 'examples'
 out = 'out'
 libs = ['lib']

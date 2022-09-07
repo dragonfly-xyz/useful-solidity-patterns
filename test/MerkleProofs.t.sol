@@ -2,7 +2,7 @@
 pragma solidity ^0.8.15;
 
 import "forge-std/Test.sol";
-import "../examples/merkle-proofs/MerkleProofs.sol";
+import "../patterns/merkle-proofs/MerkleProofs.sol";
 import "./TestUtils.sol";
 
 contract MerkleProofsTest is Test, TestUtils {
