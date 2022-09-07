@@ -27,7 +27,7 @@ Make sure you have [foundry](https://book.getfoundry.sh/getting-started/installa
 
 ```bash
 # Clone the repo
-$> git clone git@github.com:Dragonfly-Capital/useful-solidity-patterns.git
+$> git clone git@github.com:dragonfly-xyz/useful-solidity-patterns.git
 # Install foundry dependencies
 $> forge install
 # Run tests
