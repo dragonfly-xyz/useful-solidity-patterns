@@ -3,19 +3,19 @@
 - [📜 Example Code](./PooledExecute.sol)
 - [🐞 Tests](../../test/PooledExecute.t.sol)
 
-If you want to build a resilient contract that interacts with other contracts outside of your own, you should at least consider whether you need to gracefully handle errors when calling into them. In extreme cases, failure to do so could lead to scenarios where your contract becomes permanently frozen because some external contract it relies on reverts unexpectedly. Here we'll explore ways to handle those reverts.
+Any contract that interacts with external tokens or protocols should at least consider whether they need to gracefully handle errors when calling into them. In extreme cases, failure to do so could lead to scenarios where your contract becomes permanently frozen because some external contract it relies on reverts unexpectedly. Here we'll explore different ways to handle those errors and what we can do with them.
 
 ## Reverts and Call Contexts
 
-To understand what a revert really is, first let's quickly go over how reverts are related to EVM call contexts.
+First let's establish some foundational understanding of reverts by quickly going over how they're related to EVM call contexts.
 
-Each time a contract makes an external call (even to itself using `this.fn()` syntax), a new call context is entered. When a revert is encountered in that call, execution within that call context ends immediately and all state changes (aside from gas used) that occurred within that call (including calls it made itself) are undone (hence why it's called a "revert"). If all callers in the call chain use vanilla Solidity calling constructs, reverts will cascade upwards causing the entire transaction to eventually fail.
+Each time a contract makes a call to a function on another contract (and even to itself using `this.fn()` syntax), a new call context is entered. When a revert is encountered in that call, execution within that call context halts immediately and all state changes that occurred as a result of that call are undone (hence why it's called a "revert"). If no callers in the call chain intercept the revert, the revert will eventually bubble all the way upwards causing the entire transaction to fail.
 
 ![call-context-revert](solidity-call-reverts.png)
 
 ### Internal Calls
 
-Note that calls to `internal`/`private` functions as well as calls to `public` functions without using `this` (e.g., `foo()` instead of `this.foo()`) are not true calls and will actually be implemented as `JUMP` instructions, effectively running as if they were defined inside the function that called it. This means that they stay within the same call context of the function that called them, so reverting inside them is has the same same effect as reverting inside their caller. As such, the caller cannot actually recover from a revert from an `internal` function since it will never have an opportunity to regain execution control. So these *are not* the types of function calls we're covering here.
+It's worth pointing out that calls to `internal`/`private` functions as well as calls to `public` functions without using `this` redirection (e.g., `foo()` instead of `this.foo()`) are not true calls and will actually be implemented as `JUMP` instructions by the compiler, running similarly as if they were defined inside the calling function itself. This means that invoking them does not create a new call context, so reverting inside them has the same same effect as reverting inside their caller. There is no way to capture reverts a function throws inside of its own call context so these *are not* the types of function calls we're covering here.
 
 ## A Tale of Two Reverts
 
@@ -25,13 +25,13 @@ But there is another, more insidious type of revert that can be raised with the 
 
 ## Handling Reverts
 
-As illustrated earlier, when making a vanilla call through solidity, the compiler will generate code that bubbles up any revert, meaning your function that made the failing call will immediately also revert in response. This revert data is bubbled up unmolested (e.g., no stack trace will be generated), so usually there is no easy way to identify which underlying call the revert originated from while on-chain.
+As illustrated earlier, when making a vanilla call through solidity, the compiler will generate code that bubbles up any revert, meaning your function that made the failing call will immediately also revert in response.
 
 Now let's look at ways to avoid this default behavior and eventually respond to a revert instead of just giving up 😛.
 
 ### `try` + `catch`
 
-Solidity `0.6.0` introduced the `try`/`catch` contstruct which lets you handle call reverts with syntax familiar to other languages. Unlike other, visually similar languages, Solidity's `try`/`catch` only wraps *a single external call*, which immediately follows the `try` keyword.
+Solidity `0.6.0` introduced the `try`/`catch` contstruct which lets you handle call reverts with syntax familiar to other languages. Unlike visually similar languages, Solidity's `try`/`catch` only wraps *a single external call*, which immediately follows the `try` keyword.
 
 ```solidity
 try someContract.someFunction(arg1, arg2) returns (uint256 someResult) {
@@ -61,23 +61,23 @@ if (success) {
 }
 ```
 
-Now, this is obviously more long-winded and error-prone than `try`/`catch`, which can give you type-safety on the contract, arguments, and return value, rendering low-level calls less appealing. But there are still extremely compelling reasons to use low-level calls as will be demonstrated [next](#adding-even-more-resiliency).
+This syntax obviously more long-winded and error-prone than `try`/`catch`, which can give you type-safety on the contract, arguments, and return value. But there are still extremely compelling reasons to use low-level calls as will be demonstrated [later](#adding-even-more-resiliency).
 
 ## Inspecting Revert Data
 
-Now that we have prevented automatic failure and have access to the revert data, what can we do with it it?
+Now that we have interrupted the bubbling up of reverts and have access to the revert data, what can we do with it it?
 
-You'll notice that, in all examples, the revert data is of type `bytes`. If you're used to throwing string reverts via `require()` or `revert()` syntax, you may wonder why this is not just of type `string`. The reason is that revert data (just like return data) can be any sequence of bytes. Using the `revert` keyword (not function) will allow you to throw a custom ABI-encoded error type. In fact, when you throw a string revert, the revert data is not simply the bytes of the string but actually the ABI-encoded call to a function with a signature of `Error(string)`:
+You'll notice that, in all examples, the revert data is of type `bytes`. If you're used to throwing string reverts via `require()` or `revert()` syntax, you may wonder why this is not just of type `string`. The reason is that revert data (just like return data) can be any arbitrary sequence of bytes. Using the `revert` keyword (not function) will allow you to throw a custom ABI-encoded error type. In fact, when you throw a string revert, the revert data is not the string itself but actually ABI-encoded call data to a function with a signature of `Error(string)` (i.e., `0x08c379a00000000000000000000000000000000000000000000000000000000000000020...`):
 
 ```solidity
 revert('hello')
 // ^ is equivalent to:
-error Error(string); // Declare custom error type
+error Error(string msg); // Declare custom error type
 ...
 revert Error('hello'); // Throw custom error type
 ```
 
-So, let's say we want to act differently if the contract reverts with the string 'foo':
+So, let's say we want to act differently if the contract reverts with the string `'foo'`. We can compare the hash (because this is often quicker than comparing bytes) of revert data to the hash of the ABI-encoded call to `Error(string)` with argument `'foo'`:
 
 ```solidity
 try someContract.someFunction(arg1, arg2) returns (uint256 someResult) {
@@ -92,7 +92,7 @@ try someContract.someFunction(arg1, arg2) returns (uint256 someResult) {
 
 ## Manually Bubbling Up Reverts
 
-In either approach, we've interrupted the compiler default behavior of bubbling up the revert error to our own caller. We may find that we do not want to gracefully handle certain errors and want them to bubble up for the caller above us to handle. Often novice solidity engineers will do something like:
+With either approach we've interrupted the compiler default behavior of bubbling up the revert error to our own caller. We may find that we do not want to handle certain errors and instead want them to bubble up for the caller above us to handle. Often novice solidity devs will try to re-throw the revert data with `revert()` like:
 
 ```solidity
 (bool success, bytes memory returnOrRevertData) = someContract.call(...);
@@ -104,7 +104,7 @@ if (!success) {
 }
 ```
 
-But remember that `returnOrRevertData` can potentially be (and usually is) an ABI-encoded `Error(string)` type, not a string at all (i.e., `08c379a00000000000000000000000000000000000000000000000000000000000000020...`)! And since `revert()` ABI-encodes its argument as an `Error(string)` type, what actually ends up being bubbled up to the caller is a double-encoded `Error(string)` (an error within an error), which makes absolutely no sense. The correct way to bubble up a captured revert without altering the data is to drop to some simple assembly:
+But remember that revert data can potentially be (and often is) an ABI-encoded `Error(string)` type, not a string at all! And since `revert()` ABI-encodes its argument as an `Error(string)` type, what actually ends up being bubbled up to the caller is a double-encoded `Error(string)` (an encoded error within an encoded error), which makes absolutely no sense. The correct way to bubble up a captured revert without altering the data is to drop into some simple assembly:
 
 ```solidity
 (bool success, bytes memory returnOrRevertData) = someContract.call(...);
@@ -123,7 +123,7 @@ if (!success) {
 
 ### Adding More Resiliency
 
-If your code is calling contracts that you either haven't vetted and/or if those contracts (or one they call) can realistically encounter an `INVALID` opcode, then it might make sense to also add a gas limit to your call. This limit the *maximum* amount of gas the call can consume. This way, you can be sure to still have enough gas remaining after the call returns to perform failover logic. You can do this with both `try`/`catch` and low-level call constructs:
+If your code is calling contracts that you either haven't vetted and/or if those contracts (or one that they call) can realistically encounter an `INVALID` opcode, then it might make sense to also add a gas limit to your call. Without it, the call may have the potential to consume all remaining gas. This limits the *maximum* amount of gas the call can consume, not the minimum. This way, you can be sure to still have enough gas remaining after the call returns to perform failover logic. You can apply a gas limit with both `try`/`catch` and low-level call constructs:
 
 ```solidity
 // Restrict a try/catch call to 500k max gas.
@@ -141,19 +141,17 @@ try someContract.someFunction{gas: 500e3}(arg1, arg2) returns (uint256 someResul
 
 ### Adding Even More Resiliency
 
-There's also sneakier way a call can fail that `try`/`catch` won't be able to handle, because the revert will actually be thrown by code generated by the solidity compiler *as part of your function*. This can happen if:
+There are some exotic edge cases that `try`/`catch` cannot handle because the revert will actually be thrown by code generated by the solidity compiler *as part of your function*. This can happen if:
 
-- You're making a standard (not low-level) function call *that expects no return value* to an address that does not have any code.
-    - This is because the compiler will generate code that first asserts that the address has code in it.
-    - Perhaps the contract never existed or self-destructed.
+- You're making a function call *that expects no return value* to an address that does not have any code in it.
+    - This is because the compiler will generate code that first asserts that the call target has code in it.
+    - Perhaps the contract at the call target never existed or self-destructed.
 - The call returns data that cannot be abi-decoded as the expected return type.
-    - To illustrate, say your the function is supposed to return a `uint256` but actually returns 0 data.
+    - For example, your the function is supposed to return a `uint256` but actually returns less than 32 bytes of data.
     - Perhaps the contract is malicious or implements a token standard incorrectly.
 
-To handle these cases gracefully, we may want to return to low-level calls because:
-- The default behavior of performing a call on an address without code is to *succeed* and return empty data.
-    - So if the call succeeds and is expected to return something, we can avoid checking if there is code at the contract by simply checking that the return data is non-zero length.
-    - *However, be wary that if the call succeeds and is expected to return nothing, and does indeed return nothing, that this is not proof that there is a contract at that address*.
+To handle these more exotic cases gracefully, we may want to return to low-level calls because:
+- The compiler will not generate the code check for the call target.
 - We can perform validation on the abi-encoded return data before passing it into `abi.decode()` to avoid causing ourselves to revert the way `try`/`catch` would.
 
 ```solidity
@@ -172,16 +170,16 @@ if (success) {
 ...
 ```
 
+The default behavior of performing a call on an address without code is to *succeed* and return empty data. So if the call succeeds and is expected to return something, we can avoid checking if there is code at the contract by simply checking that the return data is non-zero length. However, be wary that if the call is expected to return nothing, there is no way to distinguish a successful call to a contract vs a call to an EOA, so you may want to manually check that the target address actually contains code in these cases.
+
 ## Who Really Needs This?
 
-Remember that these strategies are only necessary when it's important that your contract be able to gracefully recover from a revert. Also, your contract may not even care what the contents of the revert data are, but may just want to treat any revert equally. Many times, especially for simpler protocols that do not interact with other protocols, not handling the revert and simply allowing the entire transaction to fail is actually the simpler and also perfectly acceptable approach... but not always 😉.
-
-To illustrate a case where this need might arise, take an example of a protocol that tracks an unrestricted basket of assets owned by an address, where you still want users to be able to perform interactions even if one asset in the basket no longer functions (e.g., an ERC721 token getting burned causing `ownerOf()` to fail).
+Sufficiently complex protocols that build on other protocols and tokens will usually need some kind of error handling in some part of their system (certain ERC20 tokens are notoriously non-compliant). But depending on how critically you rely on external contracts and whether those contracts behave reliably, you may not need to be as resilient and it's rare you would need to worry about the contents of the revert data. In the majority of cases, simply doing nothing and allowing the revert to bubble up is actually the simpler and also perfectly acceptable approach.
 
 ## Runnable Example
 
-The [included example](./PooledExecute.sol) is a contract that will execute an arbitrary call with value (set in the constructor) once enough users have contributed enough ETH via `join()`. If the call fails, everyone who contributed can withdraw their contribution via `withdraw()`.
+The [included example](./PooledExecute.sol) is a contract that will execute an arbitrary call with value (set in the constructor) once enough users have contributed enough ETH via `join()`. If the call fails, everyone who contributed can withdraw their contribution via `withdraw()`. If we did not recover from a failed call, we would have to rely on some other mechanism to begin the withdrawal phase.
 
 ## References
 
-This guide provides an embarrassingly condensed overview of Solidity reverts and error handling. For the full technical details, visit [the official docs](https://docs.soliditylang.org/en/v0.8.16/control-structures.html#error-handling-assert-require-revert-and-exceptions).
+This guide provides an embarrassingly condensed overview of Solidity revert and error constructs. For the full technical details, visit [the official docs](https://docs.soliditylang.org/en/v0.8.16/control-structures.html#error-handling-assert-require-revert-and-exceptions).

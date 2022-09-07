@@ -6,7 +6,7 @@ The code examples herein are meant to be educational. Most have not been audited
 
 ## [Solidity Patterns](./patterns)
 - [Advanced Error Handling](./patterns/error-handling)
-    - Build resilient contracts that can intercept and react to EVM reverts.
+    - Write resilient code that intercepts and reacts to errors thrown by other contracts.
 - [`eth_call` Tricks](./patterns/eth_call-tricks)
     - Perform fast, complex queries of on-chain data and simulations with zero deployment cost using `eth_call`.
 - [Explicit Storage Buckets](./patterns/explicit-storage-buckets)
