@@ -92,7 +92,7 @@ try someContract.someFunction(arg1, arg2) returns (uint256 someResult) {
 
 ## Manually Bubbling Up Reverts
 
-With either approach we've interrupted the compiler default behavior of bubbling up the revert error to our own caller. We may find that we do not want to handle certain errors and instead want them to bubble up for the caller above us to handle. Often novice solidity devs will try to re-throw the revert data with `revert()` like:
+We may find that we do not want to handle certain errors and instead want them to bubble up for the caller above us to handle. Often novice solidity devs will try to re-throw the revert data with `revert()` like:
 
 ```solidity
 (bool success, bytes memory returnOrRevertData) = someContract.call(...);
@@ -123,7 +123,7 @@ if (!success) {
 
 ## Adding More Resiliency
 
-If your code is calling contracts that you either haven't vetted and/or if those contracts (or one that they call) can realistically encounter an `INVALID` opcode, then it might make sense to also add a gas limit to your call. Without it, the call may have the potential to consume all remaining gas. This limits the *maximum* amount of gas the call can consume, not the minimum. This way, you can be sure to still have enough gas remaining after the call returns to perform failover logic. You can apply a gas limit with both `try`/`catch` and low-level call constructs:
+If your code is calling contracts that you either haven't vetted and/or if those contracts (or one that they call) can realistically encounter an `INVALID` opcode, then it might make sense to also add a gas limit to your call. Without it, the call may have the potential to consume all remaining gas. Specifying a gas limit limits the *maximum* amount of gas the call can consume, not the minimum. This way, you can be sure to still have enough gas remaining after the call returns to perform failover logic. You can apply a gas limit with both `try`/`catch` and low-level call constructs:
 
 ```solidity
 // Restrict a try/catch call to 500k max gas.
