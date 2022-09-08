@@ -174,7 +174,7 @@ The default behavior of performing a call on an address without code is to *succ
 
 ## Who Really Needs This?
 
-Sufficiently complex protocols that build on other protocols and tokens will usually need some kind of error handling in some part of their system (certain ERC20 tokens are notoriously non-compliant). But depending on how critically you rely on external contracts and whether those contracts behave reliably, you may not need to be as resilient and it's rare you would need to worry about the contents of the revert data. In the majority of cases, simply doing nothing and allowing the revert to bubble up is actually the simpler and also perfectly acceptable approach.
+Sufficiently complex protocols that build on other protocols and tokens will usually need some kind of error handling in some part of their system (certain ERC20 tokens are notoriously non-compliant). So it is not uncommon to find these strategies in the wild. But depending on how critically you rely on external contracts and whether those contracts behave reliably, you may not need to be as resilient and it's rare you would need to worry about the contents of the revert data. In the majority of cases, simply doing nothing and allowing the revert to bubble up is actually the simpler and also perfectly acceptable approach.
 
 ## Runnable Example
 
