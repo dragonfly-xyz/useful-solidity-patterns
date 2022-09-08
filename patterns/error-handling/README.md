@@ -147,7 +147,7 @@ There are some exotic edge cases that `try`/`catch` cannot handle because the re
     - This is because the compiler will generate code that first asserts that the call target has code in it.
     - Perhaps the contract at the call target never existed or self-destructed.
 - The call returns data that cannot be abi-decoded as the expected return type.
-    - For example, your the function is supposed to return a `uint256` but actually returns less than 32 bytes of data.
+    - For example, the function is supposed to return a `uint256` but actually returns less than 32 bytes of data.
     - Perhaps the contract is malicious or implements a token standard incorrectly.
 
 To handle these more exotic cases gracefully, we may want to return to low-level calls because:
