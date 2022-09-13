@@ -9,6 +9,8 @@ The code examples herein are meant to be educational. Most have not been audited
     - Write resilient code that intercepts and reacts to errors thrown by other contracts.
 - [`eth_call` Tricks](./patterns/eth_call-tricks)
     - Perform fast, complex queries of on-chain data and simulations with zero deployment cost using `eth_call`.
+- [ERC20 (In)Compatibility](./patterns/erc20-compatibility)
+    - Working with both compliant and non-compliant (which are more common than you think) ERC20 tokens.
 - [Explicit Storage Buckets](./patterns/explicit-storage-buckets)
     - Safer, guaranteed non-overlapping storage for upgradeable contracts.
 - [Factory Proofs](./patterns/factory-proofs)
