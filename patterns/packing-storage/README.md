@@ -1,7 +1,6 @@
 # Packing Storage
 
 - [📜 Example Code](./PackedStoragePayouts.sol)
-- [🐞 Tests](../../test/PackedStoragePayouts.t.sol)
 
 Contract storage in the EVM is built around the concept of "slots," where each slot is 32 bytes wide and can be indexed by any 256-bit number. In the simple case, the compiler will assign storage variables to successive slots as you declare them in your contracts.
 
@@ -36,7 +35,7 @@ But you don't need to do this!
 ## Automatic Slot Packing
 The above syntax is pretty unsightly. Fortunately the solidity compiler will do this for you, out of the box, for free!
 
-The compiler will attempt to pack any storage variables that are delcared **adjacent** to each other, so long as they can fit inside 32 bytes. If they cannot fit in the same slot, the next slot is used and packing starts anew from there. Because of this process, each storage variable innately has a "slot" (0 - 2^32-1) and byte "offset" (0-31) property associated with it. When you write solidity that accesses a storage variable, the compiler will generate code that performs the bitwise operations to isolate the variable from the slot, just like when we did it manually but without having to think about it.
+The compiler will attempt to pack any storage variables that are declared **adjacent** to each other, so long as they can fit inside 32 bytes. If they cannot fit in the same slot, the next slot is used and packing starts anew from there. Because of this process, each storage variable innately has a "slot" (0 - 2^32-1) and byte "offset" (0-31) property associated with it. When you write solidity that accesses a storage variable, the compiler will generate code that performs the bitwise operations to isolate the variable from the slot, just like when we did it manually but without having to think about it.
 
 ### What Types Pack?
 
@@ -50,9 +49,9 @@ All primitive types < 32 bytes that are declared *adjacent*, even across inherit
 - `bool`s
 - `enum`s
 
-Delcaring any non-primitive type (structs, arrays, mappings, etc) of storage variable will interrupt the packing allocation (S) and will assign that variable to a new slot (S+1), even if the current slot is not fullly utilized. Non-primitive types cannot be packed with adjacent variables so the following variable will also start on a new slot (S+2).
+Declaring any non-primitive type (structs, arrays, mappings, etc) of storage variable will interrupt the packing allocation (S) and will assign that variable to a new slot (S+1), even if the current slot is not fullly utilized. Non-primitive types cannot be packed with adjacent variables so the following variable will also start on a new slot (S+2).
 
-Certain types will also pack fields/values *within* themselves, but not with variables delcared adjacent to them. This includes `struct`s, fixed-width arrays, and short (<32 length) `bytes`/`string`s.
+Certain types will also pack fields/values *within* themselves, but not with variables declared adjacent to them. This includes `struct`s, fixed-width arrays, and short (<32 length) `bytes`/`string`s.
 
 Take, for example, the following contracts:
 ```solidity
