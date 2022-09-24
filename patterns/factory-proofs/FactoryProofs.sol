@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.17;
 
 contract FactoryProofs {
     // Validate that `deployed` was deployed by `deployer` using regular create opcode

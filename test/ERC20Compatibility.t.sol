@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.17;
 
 import "../patterns/erc20-compatibility/ERC20Compatibility.sol";
 import "./TestUtils.sol";
