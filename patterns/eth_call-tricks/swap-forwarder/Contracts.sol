@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.17;
 
 // Contract that we will fake deploy and call directly into to evaluate
 // the outcome of a complex swap between two protocols.

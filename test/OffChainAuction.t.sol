@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.17;
 
 import "forge-std/Test.sol";
 import "solmate/tokens/ERC721.sol";
 
-import "../examples/off-chain-storage/OffChainAuction.sol";
+import "../patterns/off-chain-storage/OffChainAuction.sol";
 import "./TestUtils.sol";
 
 contract OffChainAuctionTest is Test, TestUtils {

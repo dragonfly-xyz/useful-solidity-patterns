@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.17;
 
 import "forge-std/Test.sol";
-import "../examples/explicit-storage-buckets/ExplicitStorageBuckets.sol";
+import "../patterns/explicit-storage-buckets/ExplicitStorageBuckets.sol";
 import "./TestUtils.sol";
 
 contract ExplicitStorageBuckets is Test, TestUtils {
