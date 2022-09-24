@@ -1,5 +1,5 @@
 [profile.default]
-src = 'examples'
+src = 'patterns'
 out = 'out'
 libs = ['lib']
 
