@@ -143,11 +143,11 @@ When working with assets from outside of a protocol, users typically either need
 
 ## Notable Uses
 
-This is an fairly common pattern, particularly in defi, but it's making its way into other sectors as well.
+This is a fairly common pattern, particularly in defi, but it's making its way into other sectors as well.
 
 
 - [0x](https://docs.0x.org/), [Opensea](https://support.opensea.io/hc/en-us/articles/4449355421075-What-does-a-typed-signature-request-look-like-) (both seaport and wyvern), [CoWSwap](https://docs.cow.fi/smart-contracts/settlement-contract/signature-schemes), etc.
-    - These protocols all essentially ask users to sign an off-chain order, using EIP712, which can get filled by a counter-party at a later time.
+    - These protocols all essentially ask users to sign an off-chain limit order, using EIP712, which can get filled by a counter-party at a later time.
 - [Uniswap](https://github.com/Uniswap/governance/blob/master/contracts/GovernorAlpha.sol#L248) and [Compound](https://docs.compound.finance/v2/governance/#cast-vote-by-signature) Governance
     - Members can vote and/or delegate their votes with an off-chain EIP712 message.
 - [Opensea Lazy-minting](https://opensea.io/blog/announcements/introducing-the-collection-manager/)
