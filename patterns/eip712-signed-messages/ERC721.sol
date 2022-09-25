@@ -38,6 +38,10 @@ contract ERC721 {
         emit Transfer(address(0), owner, tokenId);
     }
 
+    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
+        return interfaceId == 0x780e9d63;
+    }
+
     function ownerOf(uint256 tokenId) external view returns (address owner) {
         owner = _ownerOf[tokenId];
         require(owner != address(0), 'invalid token');
