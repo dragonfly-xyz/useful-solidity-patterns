@@ -39,7 +39,7 @@ contract ERC721 {
     }
 
     function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
-        return interfaceId == 0x780e9d63;
+        return interfaceId == 0x80ac58cd;
     }
 
     function ownerOf(uint256 tokenId) external view returns (address owner) {
