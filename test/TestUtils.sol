@@ -6,6 +6,12 @@ import "forge-std/Test.sol";
 contract TestUtils is Test {
     uint256 private immutable _nonce;
 
+    modifier onlyForked() {
+        if (block.number > 1e6) {
+            _;
+        }
+    }
+
     constructor() {
         _nonce = uint256(keccak256(abi.encode(
             tx.origin,
