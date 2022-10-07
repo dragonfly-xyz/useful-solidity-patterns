@@ -7,6 +7,8 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
 ## [Solidity Patterns](./patterns)
 - [Advanced Error Handling](./patterns/error-handling)
     - Write resilient code that intercepts and reacts to errors thrown by other contracts.
+- [Basic Proxies](./patterns/basic-proxies)
+    - Contracts with upgradeable logic.
 - [EIP712 Signed Messages](./patterns/eip712-signed-messages)
     - Human-readable off-chain messages that can be consumed on-chain.
 - [ERC20 (In)Compatibility](./patterns/erc20-compatibility)
