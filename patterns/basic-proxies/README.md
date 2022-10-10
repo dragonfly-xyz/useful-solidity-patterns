@@ -3,9 +3,9 @@
 - [📜 Example Code](./ProxyWallet.sol)
 - [🐞 Tests](../../test/ProxyWallet.t.sol)
 
-Typically a smart contract's logic (bytecode) cannot change once it's been deployed. For many people that is a good thing because it mitigates the developer's ability to change the rules out from under users. But more complex protocols often need more flexibility. The proxy pattern allows developers to replace the logic of a contract even after it has been deployed. Proxy patterns are generally used to satisfy any of the following needs:
+Typically a smart contract's logic (bytecode) cannot change once it's been deployed. For many people that is a good thing because it mitigates the developer's ability to change the rules out from under users. But more complex protocols often need more flexibility. The proxy pattern allows developers to replace the logic of a contract even after it has been deployed. Proxy patterns are generally used to satisfy any of the following needs/scenarios:
 
-- **Iterative development**: This is the most obvious benefit of proxies. By replacing the logic of a deployed contract in-place, you can add new features/functions without having to migrate users, allowances, or balances.
+- **Iterative development**: By replacing the logic of a deployed contract in-place, you can add new features/functions to your contract without having to migrate users, allowances, or balances.
 - **Cheaper deployments**: If you find yourself deploying the same contract multiple times, using a proxy pattern can significantly reduce deployment costs because the logic bytecode is stored elsewhere and only needs to be deployed once.
 - **Code size limits**: Ethereum has a ~24KB maximum code size limit for a deployed contract, which is surprisingly easy to exceed with complex protocols. Logic in proxy architectures can be spread across multiple contracts so no single contract exceeds the bytecode size limit.
 
