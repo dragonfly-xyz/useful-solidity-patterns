@@ -16,7 +16,7 @@ Let's dive into what it takes to implement a basic proxy from scratch. The proxy
 ### `delegatecall()`
 In solidity, a normal function call made to another contract compiles down to using either the `address.call()`  or `address.staticcall()` semantics. Both of these call types will execute the function in the context of the target contract, meaning it can only access its own state (address, storage, balances, etc).
 
-But if we instead explicitly make a call using `address.delegatecall()`, it will execute the call with the code at `address` *but in the same state context as the caller*. This means any storage reads and writes actually operate on the caller's storage. The target contract will essentially assume the identity of the caller, also inheriting the same `address(this)`, ETH balance, and so on. So any external calls the logic contract makes will appear as if they're coming from the caller itself.
+But if we instead explicitly make a call using `address.delegatecall()`, it will execute the call with the code at `address` *but in the same state context as the caller*. This means any storage reads and writes actually operate on the caller's storage. The target contract will essentially assume the identity of the caller, also inheriting the same `address(this)`, ETH balance, and so on. So any external calls the logic contract makes will also appear as if they're coming from the caller itself. It's as if we replaced our own code with the target contract's code.
 
 ### The Fallback Function
 Solidity allows you to define a `fallback()` function on your contract. Any calls to undefined functions will trigger this function. Take, for example:
