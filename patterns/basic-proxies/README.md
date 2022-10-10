@@ -148,7 +148,7 @@ Etherscan knows to look out for EIP-1967 style proxies and will show users the "
 ![etherscan-proxy](./etherscan-proxy.png)
 
 ## Pitfalls
-As you can see, it's pretty easy to implement a simple proxy pattern. But this approach comes with major risks that you will need to consider *throughout* the lifetime of your contract:
+As you can see, it's really not that difficult to implement a simple proxy pattern for your contracts. But while this pattern is extremely flexible and powerful, it's also been implicated in many hacks. To use it securely you need to be constantly mindful of the many risks it can introduce.
 
 ### Securing The Logic Contract(s)
 The logic contract oftentimes is just a regular contract, which someone could directly interact with. This usually doesn't matter because, when used this way, any state changes would only be made on the logic contract's storage/account, not the proxy contract. However, there is one state change that can adversely impact the proxy: a `selfdestruct()`. If someone is able to call `selfdestruct()` on the logic contract directly, the logic contract will be erased, and any proxy contracts that forward their calls to it will start reverting (or, worse, silently succeeding), effectively trapping any funds inside them. This is exactly what happened in the [parity wallet hack](https://blog.openzeppelin.com/on-the-parity-wallet-multisig-hack-405a8c12e8f7/).
