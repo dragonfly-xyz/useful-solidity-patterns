@@ -190,7 +190,7 @@ A contract's constructor only gets called when that contract is being deployed. 
 Initialization functions carry some risk. Extreme care must be taken to ensure these initiailization functions are guarded so that they cannot be called again. Otherwise someone could, for example, reinitialize your contract, setting themselves as the admin.
 
 #### Operational Security
-The upgrade mechanism of a contract can and should be permissioned to an admin account. Since the admin account can completely change the logic behind a proxy, rugging assets if desired, that account can become extremely attractive for hackers to target. Often projects will put the admin account behind a multisig to mitigate the impact of a compromise, but that is only as secure as the practices followed by the multisig signers.
+The upgrade mechanism of a contract can and should be permissioned to an admin account. The admin account can completely change the logic behind a proxy, making for an easy rug, so that admin account can become an extremely attractive for hackers to target. Often projects will put the admin account behind a multisig to mitigate the impact of a compromise, but that is only as secure as the practices followed by the multisig signers. As another line of defense, the upgrade function can be time-locked and monitored so that users and maintainers have time to respond to a malicious logic change.
 
 ## The Example
 The included [demo contracts](./ProxyWallet.sol) feature a proxified wallet whose original logic only worked with ETH but can be upgraded to a logic contract that can also work with ERC20 tokens. The [tests](../../test/ProxyWallet.t.sol) illustrate how to compose the contracts together.
