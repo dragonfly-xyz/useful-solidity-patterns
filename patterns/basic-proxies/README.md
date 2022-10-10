@@ -90,9 +90,14 @@ Now if we deploy `Proxy` with the address of an instance of `Logic`, we can trea
 
 ```solidity
 function test() external returns (string memory msg) {
+    // Deploy a Logic contract
     Logic logic = new Logic();
+    // Deploy a Proxy contract and set the implementation to the Logic instance.
     Proxy proxy = new Proxy(address(logic));
+    // Treat the Proxy instance as a Logic contract.
     Logic proxifiedLogic = Logic(address(proxy));
+    // call setMessage() on the Proxy instance, which will execute Logic's code
+    // but store the message in the Proxy instance's storage context.
     proxifiedlogic.setMessage("i'm the proxy");
     // returns "i'm the proxy"
     return proxifiedLogic.message();
@@ -177,10 +182,10 @@ contract NewLogic {
 }
 ```
 
-As a general rule of thumb, only append new storage variables, never delete, insert, or prepend them, to the final storage layout in new versions of logic contracts to prevent overlapping with old values. Or, [don't rely on the compiler at all to pick your storage slots](./../explicit-storage-buckets/).
+To mitigate this situation, as a general rule of thumb, only append new storage variables. Never delete, insert, or prepend them to the final storage layout in new versions of logic contracts. Or, alternatively, [don't rely on the compiler at all to pick your storage slots](./../explicit-storage-buckets/).
 
 ### (Re)Initialization
-A contract's constructor only gets called when that contract is being deployed. Any state that is touched in that constructor affects that contract's deployed instance. This often means that you will have to move some constructor logic into an explicit initialization function, defined in your logic contract but delegatecalled to from the proxy contract, so that the initiailization can be reflected in the proxy's state.
+A contract's constructor only gets called when that contract is being deployed. Any state that is touched in that constructor can only affect that contract's deployed instance (not your proxy). In a proxy architecture this usually means that you will have to move some constructor logic into an explicit initialization function that you can explicitly delegatecall into from the proxy contract. This lets the proxy execute the intitialization logic inside its own state context.
 
 Initialization functions carry some risk. Extreme care must be taken to ensure these initiailization functions are guarded so that they cannot be called again. Otherwise someone could, for example, reinitialize your contract, setting themselves as the admin.
 
