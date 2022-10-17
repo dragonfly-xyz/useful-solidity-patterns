@@ -9,6 +9,8 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
     - Write resilient code that intercepts and reacts to errors thrown by other contracts.
 - [Basic Proxies](./patterns/basic-proxies)
     - Contracts with upgradeable logic.
+- [Commit + Reveal](./patterns/commit-reveal)
+    - A two-step process for performing partially obscured on-chain actions that can't be front or back runned.
 - [EIP712 Signed Messages](./patterns/eip712-signed-messages)
     - Human-readable off-chain messages that can be consumed on-chain.
 - [ERC20 (In)Compatibility](./patterns/erc20-compatibility)
