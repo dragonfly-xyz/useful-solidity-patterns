@@ -90,7 +90,7 @@ function reclaim(uint256 auctionId) external {
 }
 ```
 
-The complete, working example can be found [here](./SealedAuctionMint.sol) with [tests](../../test/SealedAuctionMint.t.sol).
+With a blind auction implemented this way, it's impractical to snipe (bid +1) or frontrun a bid because you don't know the true amount people are bidding until they explictly reveal it, by which point you can no longer place new bids. The complete, working example can be found [here](./SealedAuctionMint.sol) with [tests](../../test/SealedAuctionMint.t.sol).
 
 ## Real-World Usage
 [Ethereum Name Service](https://ens.domains/) (ENS) is probably the most recognizable adopter of the commit-reveal scheme. The [original registrar contract](https://etherscan.io/address/0x6090a6e47849629b7245dfa1ca21d94cd15878ef#code) created blind auctions for specifc ENS names and had separate commit+reveal phases, similar to our example. [The newer version](https://docs.ens.domains/contract-api-reference/.eth-permanent-registrar/controller) no longer uses an auction mechanism but still employs commit+reveal (masking the name being bought) to prevent front-running of domain purchases.
