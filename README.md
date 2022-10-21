@@ -21,6 +21,8 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
     - Perform fast, complex queries of on-chain data and simulations with zero deployment cost using `eth_call`.
 - [Explicit Storage Buckets](./patterns/explicit-storage-buckets)
     - Safer, guaranteed non-overlapping storage for upgradeable contracts.
+- [Externally Owned Account Checks](./patterns/eoa-checks)
+    - The consequences of interacting with contracts vs regular wallets, and how to identify them.
 - [Factory Proofs](./patterns/factory-proofs)
     - Proving on-chain that a contract was deployed by a trusted deployer.
 - [Merkle Proofs](./patterns/merkle-proofs)
