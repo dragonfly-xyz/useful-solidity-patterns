@@ -1,6 +1,6 @@
 # useful-solidity-patterns
 ---
-This repo is an ongoing collection of useful, and occasionally clever, solidity/EVM patterns that actually get used in the wild. These guides are written for busy engineers with better things to do, so there should be minimal cruft, designed to get people running quickly. Guides range from from basic to advanced, are expressed in approachable terms, and presented with self-contained, concise, believable, working examples and tests that you can play with. I ([@merklejerk](https://github.com/merklejerk)) will be adding new patterns weekly but contributions are absolutely welcome!
+This repo is an ongoing collection of useful, and occasionally clever, solidity/EVM patterns that actually get used in the wild. These bite-sized guides are written in approachable terms so engineers of all skill levels can understand them. Every guide comes with a concise, self-contained, working code example and tests to demonstrate the pattern. New patterns are added weekly.
 
 *The code examples herein are meant to be educational. While the patterns are sound, the examples are not always designed with utmost security or robustness in mind, and sometimes will even forgo best practices in order to best illustrate a concept. They should not be deployed without an independent security review.*
 
