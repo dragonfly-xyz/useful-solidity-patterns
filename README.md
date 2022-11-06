@@ -1,6 +1,6 @@
 # useful-solidity-patterns
 ---
-This repo is an ongoing collection of useful, and occasionally clever, solidity/EVM patterns that actually get used in the wild. These bite-sized guides are written in approachable terms so engineers of all skill levels can understand them. Every guide comes with a concise, self-contained, working code example and tests to demonstrate the pattern. New patterns are added weekly.
+This repo is an ongoing collection of useful, and occasionally clever, solidity/EVM patterns that actually get used in the wild. These bite-sized guides are written in approachable terms so engineers of all skill levels can understand them. Every guide comes with a concise, self-contained, working code example and tests to demonstrate the pattern. New patterns are added weekly-ish.
 
 *The code examples herein are meant to be educational. While the patterns are sound, the examples are not always designed with utmost security or robustness in mind, and sometimes will even forgo best practices in order to best illustrate a concept. They should not be deployed without an independent security review.*
 
@@ -9,7 +9,7 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
     - Write resilient code that intercepts and reacts to errors thrown by other contracts.
 - [Basic Proxies](./patterns/basic-proxies)
     - Contracts with upgradeable logic.
-- [Big Data Storage](./patterns/big-data-storage)
+- [Big Data Storage (SSTORE2)](./patterns/big-data-storage)
     - Cost efficient on-chain storage of multi-word data accessible to contracts.
 - [Commit + Reveal](./patterns/commit-reveal)
     - A two-step process for performing partially obscured on-chain actions that can't be front or back runned.
@@ -33,6 +33,8 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
     - Reduce gas costs tremendously by moving contract state off-chain.
 - [Packing Storage](./patterns/packing-storage)
     - Arranging your storage variables to minimize expensive storage access.
+- [Separate Allowance Targets](./patterns/separate-allowance-targets/)
+    - Avoid having to migrate user allowances between upgrades with a dedicated approval contract.
 - Stay tuned for more 😉
 
 ## Installing, Building, Testing
