@@ -29,6 +29,8 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
     - Proving on-chain that a contract was deployed by a trusted deployer.
 - [Merkle Proofs](./patterns/merkle-proofs)
     - Storage efficient method of proving membership to a potentially large fixed set.
+- [NFT Receive Hooks](./patterns/nft-receive-hooks)
+    - Use ERC721/ERC1155 transfer callbacks to avoid having users set an allowance in advance.
 - [Off-Chain Storage](./patterns/off-chain-storage)
     - Reduce gas costs tremendously by moving contract state off-chain.
 - [Packing Storage](./patterns/packing-storage)
