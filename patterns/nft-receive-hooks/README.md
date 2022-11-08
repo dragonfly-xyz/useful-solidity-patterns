@@ -3,22 +3,22 @@
 - [📜 Example Code](./NftReceiveHooksAuction.sol)
 - [🐞 Tests](../../test/NftReceiveHooksAuction.t.sol)
 
-ERC721 (and ERC1155), the token standards that define the most common NFT contracts on EVM chains, draw heavy inspiration from ERC20. This is apparent in its allowance mechanism. Users call either `approve()` or `setApprovalForAll()` to grant another address the ability to transfer an NFT token from the owner in a future transaction/call. If the interaction that makes the NFT transfer is sent by another user (not the owner), this makes perfect sense. But if the transaction is actually sent by the token owner, there is no need to use allowances at all!
+ERC721 (and ERC1155), the token standards that define the most common NFT contracts on EVM chains, draw heavy inspiration from ERC20. This is apparent in its allowance mechanism. Users call either `approve()` or `setApprovalForAll()` to grant another address the ability to transfer an NFT token from themselves in a future transaction/call. If the interaction that performs the NFT transfer is sent by another user (not the owner), this makes perfect sense. But if the transaction is actually sent by the token owner, there is no need to use allowances at all!
 
 ## `onERC721Received()`
-The [ERC721 standard](https://eips.ethereum.org/EIPS/eip-721) defines an `onERC721Received()` handler function that lets the recipient take execution control at the time of the transfer. Additionally, an arbitrary `bytes` data parameter can also be passed along through the transfer call into the handler. This data parameter is usually decoded by the handler and provides context on the purpose of the transfer.
+The [ERC721 standard](https://eips.ethereum.org/EIPS/eip-721) defines an `onERC721Received()` handler function that lets the recipient take execution control during a call to `safeTransferFrom()`. Additionally, an arbitrary `bytes` data parameter can also be passed along through the transfer call into the handler. This data parameter is usually decoded by the handler and provides application-specific context on the purpose of the transfer.
 
 ## Case Study: Custodial Auction Listing
 
-To illustrate the advantages of the pattern, let's look at what it looks like with a conventional, allowance based approach for a fictional, custodial NFT auction protocol.
+To demonstrate the advantages of the pattern, let's see at what it looks like with a conventional, allowance based approach for a fictional, custodial NFT auction protocol.
 
 ![allowance auction](./allowance-auction.png)
 
-1. Seller makes a transaction (1) calling `nft.approve(auctionHouse, tokenId)` for the token being listed, granting `auctionHouse` an allowance to transfer `tokenId`.
+1. Seller makes a transaction (1) calling `nft.approve(auctionHouse, tokenId)` for the token being listed, granting `auctionHouse` an allowance to transfer `tokenId` on their behalf.
 2. Seller makes another transaction (2) calling `auctionHouse.list(nft, tokenId, listOptions)`.
     1. `auctionHouse` calls `nft.transferFrom(msg.sender, address(this), tokenId)` to take custody of the token and starts an auction based on `listOptions` config.
 
-Compare that approach to one using the receive hook.
+Compare that approach to a much simpler one using the receive hook.
 
 ![hook auction](./hook-auction.png)
 
@@ -40,9 +40,9 @@ function onERC721Received(address operator, address from, uint256 tokenId, bytes
 - `operator` is the address that called `safeTransferFrom()`, which in this pattern will always be `tx.origin` (owner).
 - `from` is the original owner of the token, which in this pattern will also be `tx.origin`.
 - `msg.sender` will be the ERC721 token contract.
-    - Anyone can call this function, so depending on your product, you may want to enforce that the `msg.sender` is a known NFT contract.
-- `data` is *any* arbitrary data the *caller* of `safeTransferFrom()` passes in. Do not expect it to always be well-formed.
-- This handler is not payable, so if you also need to collect ETH from the user in the same transaction, you may need to have the user set up a WETH allowance in advance.
+    - Anyone can call this function, so depending on your product's expectations, you may want to enforce that the `msg.sender` is a known NFT contract.
+- `data` is *any* arbitrary data the *caller* of `safeTransferFrom()` passes in. Do not expect it to always be well-formed because of this.
+- This handler is not `payable`, so if you also need to collect ETH from the user (unlikely) in the same transaction, you may need to have the user set up a WETH allowance in advance.
 - The return value must be `onERC721Received.selector` (`0x150b7a02`).
 
 ## ERC1155
