@@ -27,6 +27,8 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
     - The consequences of interacting with contracts vs regular wallets, and how to identify them.
 - [Factory Proofs](./patterns/factory-proofs)
     - Proving on-chain that a contract was deployed by a trusted deployer.
+- [Initializing Upgradeable Contracts](./patterns/initializing-upgradeable-contracts)
+    - Methods to safely and efficiently initialize state for proxy contracts.
 - [Merkle Proofs](./patterns/merkle-proofs)
     - Storage efficient method of proving membership to a potentially large fixed set.
 - [NFT Receive Hooks](./patterns/nft-receive-hooks)

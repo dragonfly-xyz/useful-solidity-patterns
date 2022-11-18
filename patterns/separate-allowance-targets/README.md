@@ -1,6 +1,6 @@
 # Separate Allowance Targets
 
-- [📜 Example Code](./AllowanceTArget.sol)
+- [📜 Example Code](./AllowanceTarget.sol)
 - [🐞 Tests](../../test/AllowanceTarget.t.sol)
 
 Usually protocols that need to spend a user's ERC20 tokens will ask the user to set an allowance (via `ERC20.approve()`) on their primary business logic contract which, afterwards, can directly call `transferFrom()` on the ERC20 contract to pull tokens from the user.
