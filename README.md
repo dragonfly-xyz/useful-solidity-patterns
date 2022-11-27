@@ -17,7 +17,7 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
     - Human-readable off-chain messages that can be consumed on-chain.
 - [ERC20 (In)Compatibility](./patterns/erc20-compatibility)
     - Working with both compliant and non-compliant (which are more common than you think) ERC20 tokens.
-- [ERC20 Permit](./patterns/erc20-permit)
+- [ERC20 (EIP-2612) Permit](./patterns/erc20-permit)
     - Perform an ERC20 approve and transfer in a *single* transaction.
 - [`eth_call` Tricks](./patterns/eth_call-tricks)
     - Perform fast, complex queries of on-chain data and simulations with zero deployment cost using `eth_call`.
@@ -37,6 +37,8 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
     - Reduce gas costs tremendously by moving contract state off-chain.
 - [Packing Storage](./patterns/packing-storage)
     - Arranging your storage variables to minimize expensive storage access.
+- [Permit2](./patterns/permit2)
+    - Transfer tokens securely without a direct allowance, in a way that works for all (legacy and modern) ERC20s.
 - [Separate Allowance Targets](./patterns/separate-allowance-targets/)
     - Avoid having to migrate user allowances between upgrades with a dedicated approval contract.
 - Stay tuned for more 😉
