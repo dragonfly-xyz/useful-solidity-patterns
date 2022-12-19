@@ -65,3 +65,4 @@ If you intend to support any `payable` functions as part of a multicall, the `mu
 
 ## In the Real World
 - [Uniswap V3's router contract](https://github.com/Uniswap/v3-periphery/blob/main/contracts/SwapRouter.sol#L27) and [position manager contract](https://github.com/Uniswap/v3-periphery/blob/main/contracts/NonfungiblePositionManager.sol#L25) are some of the most recognized examples of the multicall pattern.
+- PartyDAO's [Party Protocol](https://github.com/PartyDAO/party-protocol) uses the multicall pattern on their [global configurations contract](https://github.com/PartyDAO/party-protocol/blob/main/contracts/globals/Globals.sol) so they can update multiple configuration parameters at once.
