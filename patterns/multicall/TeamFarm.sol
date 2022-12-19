@@ -1,6 +1,8 @@
 //  SPDX-License-Identifer: MIT
 pragma solidity ^0.8.17;
 
+// A communal wallet for managing ERC20s and ETH that can be deposited (staked)
+// and withdrawn (unstaked) from ERC4626 vaults.
 contract TeamFarm {
     IERC20 constant ETH_TOKEN = IERC20(address(0));
     IWETH public immutable WETH;
