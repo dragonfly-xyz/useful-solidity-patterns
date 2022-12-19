@@ -2,7 +2,7 @@
 - [📜 Example Code](./TeamFarm.sol)
 - [🐞 Tests](../../test/TeamFarm.t.sol)
 
-*⚠️ Note that this is not referring to Maker's [`Multicall` utility contract](https://github.com/makerdao/multicall), which is used for performing arbitrary **read-only** calls*
+*⚠️ Note that this is not referring to Maker's [`Multicall` utility contract](https://github.com/makerdao/multicall), which is used for performing arbitrary **read-only** calls, typically in an off-chain context.*
 
 It's not uncommon for users interacting with a smart contract to occasionally need to call multiple functions to perform back-to-back operations to accomplish a single goal. However, most user wallets (EOAs) can only make a single top-level function call in a transaction. Many protocols will simply leave it up to users to make multiple transactions in these cases, or will create specialized top-level wrapper functions for commonly grouped operations (e.g., `wrapETHAndSwap()`).
 
