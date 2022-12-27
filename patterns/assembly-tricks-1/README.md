@@ -162,7 +162,7 @@ This modifies the array in place, so double check that other areas of your code 
 
 ## Shortening Statically Sized Memory Arrays
 
-Statically sized arrays *do not* store a length prefix because they're already known at compile-time, so the above approach will not work for them. But you can use the array casting trick to *shorten* statically sized arrays. Unfortunately, this will require a new variable declaration, which needlessly expands memory but avoids copying each element:
+Statically sized arrays *do not* store a length prefix because it's already known at compile-time, so the above approach will not work for them. But you can use the array casting trick to *shorten* statically sized arrays. Unfortunately, this will require a new variable declaration, which needlessly expands memory but avoids copying each element:
 
 ```solidity
 uint256[10] memory arr;
