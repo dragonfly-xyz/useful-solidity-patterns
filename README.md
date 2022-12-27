@@ -7,6 +7,8 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
 ## [Solidity Patterns](./patterns)
 - [Advanced Error Handling](./patterns/error-handling)
     - Write resilient code that intercepts and reacts to errors thrown by other contracts.
+- [Assembly Tricks (Part 1)](./patterns/assembly-tricks-1)
+    - Short, useful assembly tricks to save some gas and make up for solidity shortcomings.
 - [Basic Proxies](./patterns/basic-proxies)
     - Contracts with upgradeable logic.
 - [Big Data Storage (SSTORE2)](./patterns/big-data-storage)
