@@ -175,7 +175,7 @@ Because statically sized arrays don't have a length prefix, you can technically 
 
 ```solidity
 uint256[10] memory arr;
-// Create a shared slice of the original array, starting at the 2nd (idx 1) element to the 9th ( idx 8).
+// Create a shared slice of the original array, starting at the 2nd (idx 1) element to the 9th (idx 8).
 uint256[8] memory shortArr;
 assembly { shortArr := add(arr, 0x20) }
 ```
