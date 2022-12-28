@@ -162,7 +162,7 @@ This modifies the array in place, so double check that other areas of your code 
 
 ## Shortening Statically Sized Memory Arrays
 
-Statically sized arrays *do not* store a length prefix because it's already known at compile-time, so the above approach will not work for them. But you can use the array casting trick to *shorten* statically sized arrays. Unfortunately, this will require a new variable declaration, which needlessly expands memory but avoids copying each element:
+Statically sized arrays *do not* store a length prefix because it's already known at compile-time, so the above approach will not work for them. But you can use the array casting trick to create a fixed-length reference to a subset of the original array. Again, this does require a new variable declaration, which for statically sized arrays needlessly expands memory, but you still avoid having to copy each element this way:
 
 ```solidity
 uint256[10] memory arr;
@@ -171,4 +171,12 @@ uint256[9] memory shortArr;
 assembly { shortArr := arr }
 ```
 
+Because statically sized arrays don't have a length prefix, you can technically even point the new variable to an offset within the original array to create a shared slice!
+
+```solidity
+uint256[10] memory arr;
+// Create a shared slice of the original array, starting at the 2nd (idx 1) element to the 9th ( idx 8).
+uint256[8] memory shortArr;
+assembly { shortArr := add(arr, 0x20) }
+```
 
