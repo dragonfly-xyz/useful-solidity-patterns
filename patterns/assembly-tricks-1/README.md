@@ -146,7 +146,7 @@ arr = new uint256[N]() ───────►│      Length = N        │  p
 ```
 
 
-Using assembly, you could write to this location to change the stored length of the array. ⚠️ Keep in mind that it's usually only safe to resize an array *shorter* since resizing it longer could cause you to read from or write to a memory location that has been provisioned for another variable ⚠️.
+Using assembly, you can write directly to this location to change the stored length of the array! ⚠️ Keep in mind that it's usually only safe to resize an array *shorter* since resizing it longer could cause you to read from or write to a memory location that has been provisioned for another variable ⚠️.
 
 
 
