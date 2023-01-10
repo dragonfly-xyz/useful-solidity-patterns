@@ -1,6 +1,6 @@
 # useful-solidity-patterns
 ---
-This repo is an ongoing collection of useful, and occasionally clever, solidity/EVM patterns that actually get used in the wild. These bite-sized guides are written in approachable terms so engineers of all skill levels can understand them. Every guide comes with a concise, self-contained, working code example and tests to demonstrate the pattern. New patterns are added weekly-ish.
+This repo is an ongoing collection of useful, and occasionally clever, solidity/EVM patterns that actually get used in the wild. These bite-sized guides are written in approachable terms so engineers of all skill levels can understand them. Every guide comes with a concise, self-contained, working code example and tests to demonstrate the pattern. New patterns are added regularly.
 
 *The code examples herein are meant to be educational. While the patterns are sound, the examples are not always designed with utmost security or robustness in mind, and sometimes will even forgo best practices in order to best illustrate a concept. They should not be deployed without an independent security review.*
 
@@ -45,6 +45,8 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
     - Transfer tokens securely without a direct allowance, in a way that works for all (legacy and modern) ERC20s.
 - [Separate Allowance Targets](./patterns/separate-allowance-targets/)
     - Avoid having to migrate user allowances between upgrades with a dedicated approval contract.
+- [Stack-Too-Deep Workarounds](./patterns/stack-too-deep/)
+    - Clean solutions for getting around and avoiding stack-too-deep errors. So clean that you should do them regardless!
 - Stay tuned for more 😉
 
 ## Installing, Building, Testing
