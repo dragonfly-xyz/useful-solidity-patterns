@@ -159,3 +159,6 @@ Any time you make an external function call (calling another contract or using `
 
 ### Off-chain Computation
 Sometimes a good chunk of the computation your contract does can be performed off-chain, with the result simply passed in with the top-level call, leaving your contract to do a much simpler verification step instead. For example, instead of performing a binary search through sorted data on-chain, you could do the search off-chain, pass in the index, and the contract could just verify its validity respective to its neighbors.
+
+### Bit-packing
+Each stack value, regardless of the actual variable type it's declared as, will always take up a full 32-byte slot. So if you actually don't need a full word of precision (e.g., `uint128` vs `uint256`), you could (un)pack multiple values into a single `uint256` or `bytes32` with some bitwise arithmetic. Of course this suffers from vastly reduced readability and can be exteremely error prone to interact with, so take caution with this approach.
