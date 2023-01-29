@@ -9,10 +9,24 @@ contract MerkleDrop {
     // Whether a member has claimed their drop.
     // Note this assumes each members is only eligible for a single drop, i.e.,
     // they occur in the merkle tree only once.
-    mapping (address => bool) public hasClaimed;
+     mapping(uint256 => uint256) private claimedBitMap;
 
     constructor(bytes32 root) payable {
         ROOT = root;
+    }
+
+    function isClaimed(uint256 index) public view returns (bool) {
+        uint256 claimedWordIndex = index / 256;
+        uint256 claimedBitIndex = index % 256;
+        uint256 claimedWord = claimedBitMap[claimedWordIndex];
+        uint256 mask = (1 << claimedBitIndex);
+        return claimedWord & mask == mask;
+    }
+
+    function _setClaimed(uint256 index) private {
+        uint256 claimedWordIndex = index / 256;
+        uint256 claimedBitIndex = index % 256;
+        claimedBitMap[claimedWordIndex] = claimedBitMap[claimedWordIndex] | (1 << claimedBitIndex);
     }
 
     // Given a leaf hash in a merkle tree and a list of sibling hashes/nodes,
@@ -34,17 +48,19 @@ contract MerkleDrop {
     // Claim a drop on behalf of a member, given a proof that their claim belongs
     // to the merkle tree.
     function claim(
+        uint256 index,
         address payable member,
         uint256 claimAmount,
         bytes32[] memory proof
     )
         external
     {
+        require(!isClaimed(index), "already claimed");
         // Security note: Leaf hashes are inverted to prevent second preimage attacks,
         // i.e., passing in intermediate node values (subtree hashes) for member and
         // claimAmount.
         require(prove(~keccak256(abi.encode(member, claimAmount)), proof), 'bad proof');
-        hasClaimed[member] = true;
+        _setClaimed(index);
         member.transfer(claimAmount);
     }
 }

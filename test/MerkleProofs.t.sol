@@ -228,7 +228,7 @@ contract MerkleProofsTest is Test, TestUtils {
         uint256 memberIndex = _randomUint256() % members.length;
         bytes32[] memory proof = helper.createProof(memberIndex, tree);
         vm.prank(members[memberIndex]);
-        drop.claim(payable(members[memberIndex]), claimAmounts[memberIndex], proof);
+        drop.claim(memberIndex, payable(members[memberIndex]), claimAmounts[memberIndex], proof);
         assertEq(members[memberIndex].balance, claimAmounts[memberIndex]);
     }
 
