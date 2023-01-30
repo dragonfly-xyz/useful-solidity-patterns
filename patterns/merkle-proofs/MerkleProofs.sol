@@ -40,6 +40,7 @@ contract MerkleDrop {
     )
         external
     {
+        require(!hasClaimed[member], 'already claimed');
         // Security note: Leaf hashes are inverted to prevent second preimage attacks,
         // i.e., passing in intermediate node values (subtree hashes) for member and
         // claimAmount.

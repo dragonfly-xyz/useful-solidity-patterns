@@ -232,6 +232,22 @@ contract MerkleProofsTest is Test, TestUtils {
         assertEq(members[memberIndex].balance, claimAmounts[memberIndex]);
     }
 
+    function test_cannotclaimTwice() external {
+        (
+            address[] memory members,
+            uint256[] memory claimAmounts,
+            bytes32[][] memory tree,
+            MerkleDrop drop
+        ) = _createDrop(1 + _randomUint256() % 256);
+        uint256 memberIndex = _randomUint256() % members.length;
+        bytes32[] memory proof = helper.createProof(memberIndex, tree);
+        vm.prank(members[memberIndex]);
+        drop.claim(payable(members[memberIndex]), claimAmounts[memberIndex], proof);
+        vm.prank(members[memberIndex]);
+        vm.expectRevert('already claimed');
+        drop.claim(payable(members[memberIndex]), claimAmounts[memberIndex], proof);
+    }
+
     function _logTree(bytes32[][] memory tree) private {
         emit log_named_uint('tree height', tree.length);
         emit log_named_uint('tree width', tree[0].length);

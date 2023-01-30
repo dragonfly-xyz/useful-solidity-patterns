@@ -1,6 +1,6 @@
 pragma solidity ^0.8.17;
 
-import "../patterns/no-delegatecall/DelegateCallModifiers.sol";
+import "../patterns/only-delegatecall-no-delegatecall/DelegateCallModifiers.sol";
 import "./TestUtils.sol";
 
 contract DelegateCallModifiersTest is TestUtils {
