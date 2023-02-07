@@ -4,7 +4,7 @@
 Here's a quick collection of some short and sweet assembly tricks seen in the wild which can save you significant gas and help get around some solidity shortcomings. Remember to be extremely mindful of how and when you use these techniques, as improper implementation and usage of assembly can lead to extremely bad and difficult to find bugs.
 
 ## Bubble Up Reverts
-There are some commonly used ways to make an external call to another contract (or EOA) where a revert in the in the call itself not cause your code (the caller) to instantly revert as well:
+There are some commonly used ways to make an external call to another contract (or EOA) where a revert in the call itself not cause your code (the caller) to instantly revert as well:
 
 1. Using low-level `call()`, `delegatecall()`, `staticcall()` semantics.
 2. Using `try`/`catch` blocks.
@@ -129,7 +129,7 @@ assembly { bar := foo }
 Structs and statically sized arrays are actually closely related memory-wise so this approach incurs the same wasted memory expansion cost as with statically sized arrays, but still saves the cost of manually copying fields.
 
 ## Shortening Dynamic Memory Arrays
-The first 32-bytes/word of the memory location pointed to by a dynamically sized `memory` array variable holds the length of the array, with the the elements following directly after.
+The first 32-bytes/word of the memory location pointed to by a dynamically sized `memory` array variable holds the length of the array, with the elements following directly after.
 
 ```
                                ┌────────────────────────┐
