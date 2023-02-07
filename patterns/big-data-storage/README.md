@@ -3,7 +3,7 @@
 - [📜 Example Code](./OnChainPfp.sol)
 - [🐞 Tests](../../test/OnChainPfp.t.sol)
 
-When contracts need to store arbitrary data they will usually declare a `bytes` or `string` storage variable and write to it. This uses contract storage, which is straight-forward and intuitive but can become prohibitively expensive for larger data. Contract storage is slot-based, charging 20k gas per word (32 bytes) of data to initialize for the first time. To store 256 bytes this way would cost 160k gas.
+When contracts need to store arbitrary data they will usually declare a `bytes` or `string` storage variable and write to it. This uses contract storage, which is straightforward and intuitive but can become prohibitively expensive for larger data. Contract storage is slot-based, charging 20k gas per word (32 bytes) of data to initialize for the first time. To store 256 bytes this way would cost 160k gas.
 
 But if you don't need the ability to change the data, there's a cheaper on-chain location to store arbitrary data that contracts can still access.
 
@@ -22,7 +22,7 @@ code_deposit_cost = 200 * size
 So, to store 256 bytes of data in contract bytecode would cost only 84k, compared to the 160k for conventional contract storage, which is almost half the cost! The savings go up as the size of the data increases.
 
 ## How It Works
-But how do we store arbitrary data (not code) in bytecode storage? During contract deployment, the constructor runs first. The constructor is part of a a contract's initialization process, often setting up state variables. But what solidity abstracts away from you is that after the constructor runs, it also return's data that will make up the contract's permanent bytecode. This data is exactly what will get stored in the contract's code storage.
+But how do we store arbitrary data (not code) in bytecode storage? During contract deployment, the constructor runs first. The constructor is part of a contract's initialization process, often setting up state variables. But what solidity abstracts away from you is that after the constructor runs, it also returns data that will make up the contract's permanent bytecode. This data is exactly what will get stored in the contract's code storage.
 
 By dropping into assembly, you can preempt the compiler's built-in return to return whatever data you want stored in code storage. 
 
