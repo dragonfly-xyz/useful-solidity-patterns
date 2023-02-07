@@ -13,7 +13,7 @@ The [EIP712 standard](https://eips.ethereum.org/EIPS/eip-712) defines a way for 
 
 ## Case Study: Voting
 
-Let's walk through what an implementation (contract + dapp) looks like in practice with a simple governance protocol. This protocol allows people to vote on-chain for some proposal identified by `proposalId`. For simplicity sake, we'll let any one vote on any proposal ID and only count "yes" votes.
+Let's walk through what an implementation (contract + dapp) looks like in practice with a simple governance protocol. This protocol allows people to vote on-chain for some proposal identified by `proposalId`. For simplicity sake, we'll let anyone vote on any proposal ID and only count "yes" votes.
 
 First let's look at how a fully on-chain version would be implemented and iterate on that. The fully on-chain version has a `voteFor()` function which each voter must call directly to cast their vote for a proposal.
 
@@ -62,7 +62,7 @@ function voteForBySignatures(
 
 ### The EIP712 Type Hash
 
-The wallet provider (e.g., Metamask) will accept your message fields, condense it into a hash, then sign that hash with the user's private key. This hash is must be computed a specific way, according to the [EIP712 spec](https://eips.ethereum.org/EIPS/eip-712#specification) and ensures that messages from different protocols do not collide. Here we implement the `_getVoteHash()` function, used earlier, to compute the same hash on-chain.
+The wallet provider (e.g., Metamask) will accept your message fields, condense it into a hash, then sign that hash with the user's private key. This hash must be computed in a specific way, according to the [EIP712 spec](https://eips.ethereum.org/EIPS/eip-712#specification) and ensures that messages from different protocols do not collide. Here we implement the `_getVoteHash()` function, used earlier, to compute the same hash on-chain.
 
 ```solidity
 function _getVoteHash(uint256 proposalId) private view returns (bytes32 hash) {

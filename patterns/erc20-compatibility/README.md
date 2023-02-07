@@ -3,7 +3,7 @@
 - [📜 Example Code](./ERC20Compatibility.sol)
 - [🐞 Tests](../../test/ERC20Compatibility.t.sol)
 
-Inevitably, anyone writing smart contracts on Ethereum will have to interact with ERC20s. On its surface the [standard](https://eips.ethereum.org/EIPS/eip-20) seems straight-forward enough, but inconsistencies in how the standard has been historically implemented can completely break critical components of a protocol. These inconsistencies aren't confined to uncommon tokens, either. For a real-world example, try trading [USDT on Uniswap V1](https://etherscan.io/address/0xc8313c965C47D1E0B5cDCD757B210356AD0e400C) 😉.
+Inevitably, anyone writing smart contracts on Ethereum will have to interact with ERC20s. On its surface the [standard](https://eips.ethereum.org/EIPS/eip-20) seems straightforward enough, but inconsistencies in how the standard has been historically implemented can completely break critical components of a protocol. These inconsistencies aren't confined to uncommon tokens, either. For a real-world example, try trading [USDT on Uniswap V1](https://etherscan.io/address/0xc8313c965C47D1E0B5cDCD757B210356AD0e400C) 😉.
 
 This guide will cover the two issues most developers working with arbitrary ERC20 tokens will run into and how to get around them.
 

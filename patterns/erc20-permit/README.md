@@ -12,7 +12,7 @@ What does this pattern look like for users? The frontend will instruct the walle
 
 ![metamask permit sign prompt](./metamask-permit-sign-prompt.png)
 
-After the user signs the message, the user will then be prompted to submit a transaction to call the interaction function on the protocol, also passing in the freshly signed message as an extra parameter. On-chain, the protocol redeems the signed message to grant itself an allowance, then immediately spends that allowance to move the user's tokens and perform the reqested desired action.
+After the user signs the message, the user will then be prompted to submit a transaction to call the interaction function on the protocol, also passing in the freshly signed message as an extra parameter. On-chain, the protocol redeems the signed message to grant itself an allowance, then immediately spends that allowance to move the user's tokens and perform the requested desired action.
 
 ## How it Works
 First, for this pattern to work as described, the token must have EIP-2612 support (*but there exists [a universal workaround](#real-world-support) for legacy ERC20 tokens*).
