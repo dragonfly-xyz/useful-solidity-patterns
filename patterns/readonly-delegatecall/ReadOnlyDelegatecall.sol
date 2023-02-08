@@ -7,9 +7,12 @@ contract StorageLayout {
 interface IReadOnlyDelegateCall {
     function delegateCall(address logic, bytes memory callData) external view
         returns (bytes memory returnData);
+
+    function delegateCallAndRevert(address logic, bytes memory callData) external view;
 }
 
 contract ReadOnlyDelegateCall is StorageLayout {
+
     constructor(uint256 foo_) {
         foo = foo_;
     }
@@ -30,14 +33,25 @@ contract ReadOnlyDelegateCall is StorageLayout {
         }
         return returnOrRevertData;
     }
-}
 
-contract LogicContract is StorageLayout {
-    function readFunction() external view returns (uint256) {
-        return foo;
+    function revertExec(address logic, bytes memory callData) external view {
+        try IReadOnlyDelegateCall(address(this)).delegateCallAndRevert(logic, callData) {
+            revert('expected revert'); // Should never happen.
+        }
+        catch (bytes memory revertData) {
+            (bool success, bytes memory returnOrRevertData) =
+                abi.decode(revertData, (bool, bytes));
+            if (!success) {
+                assembly { revert(add(returnOrRevertData, 0x20), mload(returnOrRevertData)) }
+            }
+            assembly { return(add(returnOrRevertData, 0x20), mload(returnOrRevertData)) }
+        }
     }
 
-    function writeFunction() external returns (uint256) {
-        return foo = 123;
+    function delegateCallAndRevert(address logic, bytes memory callData) external {
+        (bool success, bytes memory returnOrRevertData) = logic.delegatecall(callData);
+        // Encode the return/revert data with a success prefix and revert with that.
+        bytes memory wrappedResult = abi.encode(success, returnOrRevertData);
+        assembly { revert(add(wrappedResult, 0x20), mload(wrappedResult)) }
     }
 }
