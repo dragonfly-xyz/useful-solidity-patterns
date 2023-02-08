@@ -3,8 +3,12 @@ pragma solidity ^0.8;
 
 import "forge-std/Test.sol";
 
-contract TestUtils is Test {
-    uint256 private immutable _nonce;
+contract TestUtils is Test {  uint256 internal constant PANIC_ASSERT = 0x01;
+    uint256 internal constant PANIC_MATH_UNDEROVERFLOW = 0x11;
+    uint256 internal constant PANIC_MATH_DIVIDE_BY_ZERO = 0x12;
+    uint256 internal constant INDEX_OUT_OF_BOUNDS = 0x32;
+
+    bytes4 internal constant PANIC_SELECTOR = bytes4(keccak256("Panic(uint256)"));
 
     modifier onlyForked() {
         if (block.number > 1e6) {
@@ -12,24 +16,15 @@ contract TestUtils is Test {
         }
     }
 
-    constructor() {
-        _nonce = uint256(keccak256(abi.encode(
+    function _randomBytes32() internal view returns (bytes32) {
+        return keccak256(abi.encode(
             tx.origin,
-            tx.origin.balance,
             block.number,
             block.timestamp,
             block.coinbase,
+            address(this).codehash,
             gasleft()
-        )));
-    }
-
-    function _randomBytes32() internal view returns (bytes32) {
-        bytes memory seed = abi.encode(
-            _nonce,
-            block.timestamp,
-            gasleft()
-        );
-        return keccak256(seed);
+        ));
     }
 
     function _randomUint256() internal view returns (uint256) {
@@ -56,5 +51,9 @@ contract TestUtils is Test {
 
     function _expectNonIndexedEmit() internal {
         vm.expectEmit(false, false, false, true);
+    }
+    
+    function _expectPanic(uint256 code_) internal {
+        vm.expectRevert(abi.encodeWithSelector(PANIC_SELECTOR, code_));
     }
 }
