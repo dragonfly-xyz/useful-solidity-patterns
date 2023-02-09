@@ -121,7 +121,7 @@ Compared to the first method, this one is a bit less intuitive (who writes a fun
 
 ## The Example
 
-The [example code](./ReadOnlyDelegatecall.sol) is a simple (pointless) contract that has a single, private storage variable `_foo`. Because `_foo` is `private`, external contracts wouldn't normally be able to read its value. But since it implements both `staticExec()` and `revertExec()` you can use either to pass in a logic contract that is able to read that storage slot through the magic of `delegatecall()`. The [tests](../../test/ReadOnlyDelegatecall.t.sol) demonstrate how to use it and what happens if the logic function tries to alter state in both approaches (which fails, obviously).
+The [example code](./ReadOnlyDelegatecall.sol) is a simple (pointless) contract that has a single, private storage variable `_foo`. Because `_foo` is `private`, external contracts wouldn't normally be able to read its value. But since it implements both `staticExec()` and `revertExec()` you can use either to pass in a logic contract that is able to read that storage slot through the magic of `delegatecall()`. In a realistic application, you would also take the opportunity to perform additional computation on that state. The [tests](../../test/ReadOnlyDelegatecall.t.sol) demonstrate how to use it and what happens if the logic function tries to alter state in both approaches (which fails, obviously).
 
 
 ## In The Real World
