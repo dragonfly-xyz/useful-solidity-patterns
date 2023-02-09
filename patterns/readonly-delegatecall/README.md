@@ -3,15 +3,15 @@
 - [📜 Example Code](./ReadOnlyDelegatecall.sol)
 - [🐞 Tests](../../test/ReadOnlyDelegatecall.t.sol)
 
-Delegatecalls can be used to extend the functionality of your contract by executing different bytecode/logic inside its state context. Unfortunately, `delegatecall()` has no "static" (read-only) version that reverts on state changes like `staticcall()` is to `call()`, so all delegatecalls are free to modify your contract's state or perform state-altering operations against other contracts while impersonating your contract 😱! For this reason, you definitely would *never* perform a delegatecall into arbitrary bytecode... right?
+Delegatecalls can be used to extend the functionality of your contract by executing different bytecode/logic inside its state context. It's also an efficient way to get around code size limits. Unfortunately, `delegatecall()` has no "static" (read-only) version that reverts on state changes like `staticcall()` is to `call()`, so all delegatecalls are free to modify your contract's state or perform state-altering operations against other contracts while impersonating your contract 😱! For this reason, you definitely would *never* perform a delegatecall into arbitrary bytecode... right?
 
 Well, what if you could guarantee that the code being executed results in no state changes? In that case, your contract could happily delegatecall into arbitrary bytecode and functions with no consequences. This could unlock new, read-only functionaility that make on-chain and off-chain integrations easier or more efficient.
 
 All we have to do is figure how to emulate a "static" `delegatecall()`, or two 🤗.
 
-## Case Study: Permisionless, Arbitrary Read-Only Delegatecalls
+## Case Study: Permisionless, Arbitrary, Read-Only Delegatecalls
 
-Our end goal will be to create a public function on our contract that lets *anyone* pass in the address of a logic contract and call data to `delegatecall()` into. It'll look something like:
+Our end goal will be to create a public function on our contract that lets *anyone* pass in the address of a logic contract and call data to `delegatecall()` into. This could be used to "fill in" missing or unexpected `view` functions on a contract after deployment. It'll look something like:
 
 ```solidity
 function exec(address logic, bytes memory callData) external view;
