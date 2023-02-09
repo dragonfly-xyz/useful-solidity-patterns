@@ -17,7 +17,7 @@ Our end goal will be to create a public function on our contract that lets *anyo
 function exec(address logic, bytes memory callData) external view;
 ```
 
-It should also return *exactly* whatever the `delegatecall()` returns. But we won't declare that in our hypothetical function because we can't actually know ahead of time what the return data for an arbitrary call looks like. But even without declaring it, we can (and will) use some low level assembly tricks to simply bubble up the return data without having to understand its structure, so this is fine.
+It should also return *exactly* whatever the `delegatecall()` returns. But we won't declare that in our hypothetical function because we can't actually know ahead of time what the return data for an arbitrary call looks like. But even without declaring it, we can (and will) use some low level assembly tricks to simply bubble up the return data without having to understand its structure. So this is fine.
 
 ## Method 1: Wrapping it in a `staticcall()`
 
