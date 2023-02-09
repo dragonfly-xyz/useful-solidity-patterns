@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
 import "../patterns/readonly-delegatecall/ReadOnlyDelegatecall.sol";
@@ -21,9 +21,9 @@ contract ReadOnlyDelegatecallTest is TestUtils {
             .staticExec(address(logic), abi.encodeCall(logic.writeFunction, ()));
     }
 
-    function test_cannotCallDelegateCallDirectly() external {
+    function test_cannotCallDoDelegateCallDirectly() external {
         vm.expectRevert('only self');
-        rodc.delegateCall(address(logic), abi.encodeCall(logic.readFunction, ()));
+        rodc.doDelegateCall(address(logic), abi.encodeCall(logic.readFunction, ()));
     }
 
     function test_canRevertExecReadFunction() external {
@@ -43,8 +43,8 @@ contract ReadOnlyDelegatecallTest is TestUtils {
         rodc.revertExec(address(logic), abi.encodeCall(logic.writeFunction, ()));
     }
 
-    function test_canCallDelegateCallAndRevertDirectly() external {
-        try rodc.delegateCallAndRevert(address(logic), abi.encodeCall(logic.readFunction, ()))
+    function test_canCallDoDelegateCallAndRevertDirectly() external {
+        try rodc.doDelegateCallAndRevert(address(logic), abi.encodeCall(logic.readFunction, ()))
         {
             revert('expected revert');
         } catch (bytes memory revertData) {
@@ -52,8 +52,8 @@ contract ReadOnlyDelegatecallTest is TestUtils {
         }
     }
 
-    function test_canCallDelegateCallAndRevertDirectlyWithWriteFunction() external {
-        try rodc.delegateCallAndRevert(address(logic), abi.encodeCall(logic.writeFunction, ()))
+    function test_canCallDoDelegateCallAndRevertDirectlyWithWriteFunction() external {
+        try rodc.doDelegateCallAndRevert(address(logic), abi.encodeCall(logic.writeFunction, ()))
         {
             revert('expected revert');
         } catch (bytes memory revertData) {
@@ -62,22 +62,8 @@ contract ReadOnlyDelegatecallTest is TestUtils {
     }
 }
 
-contract LogicContract is StorageLayout {
-    function readFunction() external view returns (uint256) {
-        return foo;
-    }
-
-    function revertingReadFunction() external pure returns (uint256) {
-        revert('uh oh');
-    }
-
-    function writeFunction() external returns (uint256) {
-        return foo = 123;
-    }
-}
-
-// An interface recasting staticExec() and revertExec() so the compiler will automatically
-// decode the return value for us.
+// An interface we use to recast calls to staticExec() and revertExec() so
+// the compiler will automatically decode a uint256 return value for us.
 interface IStaticExec_ReadFunction {
     function staticExec(address logic, bytes memory callData) external view returns (uint256);
     function revertExec(address logic, bytes memory callData) external view returns (uint256);
