@@ -73,7 +73,7 @@ function staticExec(address logic, bytes calldata callData)
 }
 ```
 
-And that's it! This approach is nice because it just relies on a standard, familiar EVM construct (`staticcall`) to enforce immutability. But for some contracts the existence of the `doDelegateCall()` function is too risky even though it's shielded by a `msg.sender == this` check. If your contract can make arbitrary external calls passed in by users, or if it performs delegatecalls elsewhere, it may be possible to trick the contract into calling `doDelegateCall()` outside of `staticExec()`, passing the `msg.sender` check. Because `doDelegateCall()` itself doesn't enforce a `staticcall()` context, any unauthorized calls to it can make actual, lasting state changes. For these situations, the next approach offers more robust protection.
+And that's it! This approach is elegant because it just relies on a standard, familiar EVM construct (`staticcall`) to enforce immutability. But for some contracts the existence of the `doDelegateCall()` function is too risky even though it's shielded by a `msg.sender == this` check. If your contract can make arbitrary external calls passed in by users, or if it performs delegatecalls elsewhere, it may be possible to trick the contract into calling `doDelegateCall()` outside of `staticExec()`, passing the `msg.sender` check. Because `doDelegateCall()` itself doesn't enforce a `staticcall()` context, any unauthorized calls to it can make actual, lasting state changes. For these situations, the next approach offers more robust protection.
 
 ## Method 2: Delegatecall and Revert
 
