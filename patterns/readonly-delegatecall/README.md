@@ -3,9 +3,9 @@
 - [📜 Example Code](./ReadOnlyDelegatecall.sol)
 - [🐞 Tests](../../test/ReadOnlyDelegatecall.t.sol)
 
-Delegatecalls can be used to extend the functionality of your contract by executing different bytecode/logic inside its state context. It's also an efficient way to get around code size limits. Unfortunately, `delegatecall()` has no "static" (read-only) version that reverts on state changes like `staticcall()` is to `call()`. So, by nature, delegatecalls are free to modify your contract's state or perform state-altering operations elsewhere while impersonating your contract 😱! For this reason, you definitely would *never* perform a delegatecall into arbitrary bytecode... right?
+Delegatecalls can be used to extend the functionality of your contract by executing different bytecode/logic inside its state context. It's also an efficient way to get around code size limits. Unfortunately, `delegatecall()` has no "static" (read-only) version that reverts on state changes like `staticcall()` is to `call()`. So, by nature, delegatecalls are free to modify your contract's state or perform state-altering operations elsewhere while impersonating your contract 😱! For this reason, you definitely would *never* perform a `delegatecall()` into arbitrary bytecode... right?
 
-Well, what if you could guarantee that the code being executed results in no state changes? In that case, your contract could happily delegatecall into arbitrary bytecode with no consequences to itself. This could unlock new, read-only functionaility that make on-chain and off-chain integrations easier or more efficient.
+Well, what if you could guarantee that the code being executed results in no state changes? In that case, your contract could happily `delegatecall()` into arbitrary bytecode with no consequences to itself. This could unlock new, read-only functionaility that make on-chain and off-chain integrations easier or more efficient.
 
 All we have to do is figure how to emulate a "static" `delegatecall()`, or two 🤗.
 
@@ -23,14 +23,16 @@ It should also return *exactly* whatever the `delegatecall()` returns. But we wo
 
 `staticcall()` reverts if *anything* that occurs inside of it attempts to alter state. This protection also extends to nested `call()`s and even `delegatecall()`s at any depth! So if we make an external `staticcall()` to the function that actually perofrms the `delegatecall()` we can force the `delegatecall()` to also revert if any code it executes attempts to alter state.
 
-So we'll need to define 2 `external` functions, `staticExec()` and `doDelegateCall()`, which work together like this:
+So we'll need to define 2 `external` functions, `staticExec()` (permissionless) and `doDelegateCall()` (restricted), which work together like this:
 
 1. User calls `staticExec(logic, callData)` on our contract.
-2. `staticExec()` performs a `staticcall()` to `this.doDelegateCall(logic, callData)` (our own contract).
+2. `staticExec()` performs a `staticcall()` to `this.doDelegateCall(logic, callData)` (on our own contract).
 3. `doDelegateCall()` delegatecalls into `logic`, calling a function with `callData`.
 4. We bubble up the result/revert back to the user.
 
-Let's work our way up by writing the function that actually performs the delegatecall, `doDelegateCall()`. If it reverts, we'll just bubble up (re-throw) the revert, but if it succeeds, we'll return the result as `bytes`. Note that the function needs to be declared `external` so `staticExec()` can actually call it through `this`. Also, this function doesn't inherently have any `staticcall()` protection on it (that comes next) so it's **super important** that this function is not callable from outside the contract by anyone but the contract itself!
+Let's work our way up by writing the function that actually performs the delegatecall, `doDelegateCall()`. If it reverts, we'll just bubble up (re-throw) the revert, but if it succeeds, we'll return the result as `bytes`.
+
+Note that even though the function is *not intended to be called by the user*, it still needs to be declared `external` so `staticExec()` can actually call it through `this` semantics. Also, this function doesn't inherently have any `staticcall()` protection on it (that comes next) so it's **super important** that this function is not callable from outside the contract by anyone but the contract itself!
 
 ```solidity
 function doDelegateCall(address logic, bytes memory callData)
@@ -48,7 +50,7 @@ function doDelegateCall(address logic, bytes memory callData)
 }
 ```
 
-Next we define the function users will actually interact with, `staticExec()`. It calls the `doDelegateCall()` function we just defined but through a `staticcall` context, then bubbles up the raw return `bytes` as if it returned it itself. Recognize that simply doing `this.doDelegateCall()` will perform a `call()` instead of a `staticcall()` because `doDelegateCall()` is not declared as `view` or `pure`. However, if we re-cast `this` into an interface that *does* declare `doDelegateCall()` as `view` then it will be called via `staticcall()` 🧙!
+Next we define the function users will actually interact with, `staticExec()`. It calls the `doDelegateCall()` function we just defined but through a `staticcall` context, then bubbles up the raw return `bytes` as if it returned it itself. Recognize that simply doing `this.doDelegateCall()` will perform a `call()` instead of a `staticcall()` because `doDelegateCall()` is not declared as `view` or `pure`, which is not what we want. However, if we re-cast `this` into an interface that *does* declare `doDelegateCall()` as `view` then it will be called via `staticcall()` 🧙!
 
 ```solidity
 interface IReadOnlyDelegateCall {
@@ -73,13 +75,15 @@ function staticExec(address logic, bytes calldata callData)
 }
 ```
 
-And that's it! This approach is elegant because it just relies on a standard, familiar EVM construct (`staticcall`) to enforce immutability. But for some contracts the existence of the `doDelegateCall()` function is too risky even though it's shielded by a `msg.sender == this` check. If your contract can make arbitrary external calls passed in by users, or if it performs delegatecalls elsewhere, it may be possible to trick the contract into calling `doDelegateCall()` outside of `staticExec()`, passing the `msg.sender` check. Because `doDelegateCall()` itself doesn't enforce a `staticcall()` context, any unauthorized calls to it can make actual, lasting state changes. For these situations, the next approach offers more robust protection.
+And that's it! This approach is elegant because it just relies on a standard, familiar EVM construct (`staticcall`) to enforce immutability.
+
+But for some contracts the mere existence of the `doDelegateCall()` function is too risky even though it's shielded by a `msg.sender == this` check. If your contract can make arbitrary external calls passed in by users, or if it performs delegatecalls elsewhere, it may be possible to trick the contract into calling `doDelegateCall()` outside of the safety of `staticExec()`. Because `doDelegateCall()` itself doesn't enforce a `staticcall()` context, any unauthorized calls to it can make actual, lasting state changes. For these situations, the next approach offers more robust protection.
 
 ## Method 2: Delegatecall and Revert
 
-Instead of assuming that our delegatecall function will always be called inside of a `staticcall` context, we can enforce that no state changes inside of it persist even without a `staticcall()`. We do this by simply reverting after the `delegatecall()`, which undoes everything that happened inside the current execution context. We transmit information, i.e., the delegatecall's revert message or return data, inside the payload of our revert. This means the function will *always* revert, undoing any state changes that occurred during execution, and the contents of the revert will reveal the result of that execution. 
+Instead of assuming that our delegatecall function will always be called inside of a `staticcall` context, we can enforce that no state changes inside of it persist even without a `staticcall()`. We do this by simply reverting after the `delegatecall()`, which undoes everything that happened inside the current execution context. We transmit information, i.e., the `delegatecall()`'s revert message or return data, inside the payload of our revert. This means the function will *always* revert, undoing any state changes that occurred during execution, and the contents of the revert will reveal the result of that execution. 
 
-And because this function cannot possibly alter state, we no longer have to worry about guarding against who can call it. So here's our new, reverting `delegatecall` function, `doDelegateCallAndRevert()`:
+And because this function cannot possibly alter state, we no longer have to worry about guarding against who can call it. So here's our new, always-reverting `delegatecall` function, `doDelegateCallAndRevert()`:
 
 ```solidity
 function doDelegateCallAndRevert(address logic, bytes calldata callData) external {
@@ -90,7 +94,7 @@ function doDelegateCallAndRevert(address logic, bytes calldata callData) externa
 }
 ```
 
-Now the function that calls it (what the user interacts with) will need to anticipate that `doDelegateCallAndRevert()` will *always* revert, and need to decode its revert data to determine whether to `return` the data successfully or bubble up the data as a re-thrown revert. We'll call this variant `revertExec()`.
+Technically that function performs and returns all the information a user needs, but expecting and having to parse a revert is non-intuitive. So we'll still implement a top-level `revertExec()` function that calls `doDelegateCallAndRevert()`, decodes the revert, and either returns or throws its result, like a normal function behaves.
 
 ```solidity
 interface IReadOnlyDelegateCall {
