@@ -5,7 +5,7 @@
 
 Delegatecalls can be used to extend the functionality of your contract by executing different bytecode/logic inside its state context. It's also an efficient way to get around code size limits. Unfortunately, `delegatecall()` has no "static" (read-only) version that reverts on state changes like `staticcall()` is to `call()`. So, by nature, delegatecalls are free to modify your contract's state or perform state-altering operations elsewhere while impersonating your contract 😱! For this reason, you definitely would *never* perform a delegatecall into arbitrary bytecode... right?
 
-Well, what if you could guarantee that the code being executed results in no state changes? In that case, your contract could happily delegatecall into arbitrary bytecode and functions with no consequences to itself. This could unlock new, read-only functionaility that make on-chain and off-chain integrations easier or more efficient.
+Well, what if you could guarantee that the code being executed results in no state changes? In that case, your contract could happily delegatecall into arbitrary bytecode with no consequences to itself. This could unlock new, read-only functionaility that make on-chain and off-chain integrations easier or more efficient.
 
 All we have to do is figure how to emulate a "static" `delegatecall()`, or two 🤗.
 
