@@ -41,5 +41,3 @@ For EOAs (externally owned accounts), the account nonce starts at `0` and increm
 ## Example
 
 The [example code](./FactoryProofs.sol) provided here demonstrates how to validate both kinds of deployments on-chain. `verifyDeployedBy()` verifies an address was deployed by a deployer under `CREATE` opcode semantics and `verifySaltedDeployedBy()` verifies an address was deployed by a deployer under `CREATE2` semantics.
-
-Bonus content: For a 50+% cheaper (<400 gas) version of `verifyDeployedBy()` written in assembly, take a look [here](https://gist.github.com/merklejerk/6bd03d04ccd07444990ffd98acf27dde).
