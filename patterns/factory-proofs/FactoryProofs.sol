@@ -15,6 +15,7 @@ contract FactoryProofs {
         // (number of txs it has executed) when it deployed the contract.
         // For contract deployers, the deploy nonce is 1 + the number of other contracts
         // that contract has deployed (using regular create opcode).
+        address expected;
         assembly {
             mstore(0x02, shl(96, deployer))
             let rlpNonceLength
@@ -66,13 +67,12 @@ contract FactoryProofs {
                 }
             mstore8(0x00, add(0xD5, rlpNonceLength))
             mstore8(0x01, 0x94)
-            let expected := and(
+            expected := and(
                 keccak256(0x00, add(0x16, rlpNonceLength)),
                 0xffffffffffffffffffffffffffffffffffffffff
             )
-            mstore(0x00, eq(expected, deployed))
-            return(0x00, 0x20)
         }
+        return deployed == expected;
     }
 
     // Validate that `deployed` was deployed by `deployer` using create2 opcode
