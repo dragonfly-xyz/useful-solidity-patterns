@@ -109,7 +109,7 @@ contract WalletLogic {
 }
 ```
 
-Now the `Proxy` contract's constructor can still delegatecall `initialize()`, but if anyone attempts to call it again (after deployment) through the `Proxy` instance, or tries to call it directly on the `WalletLogic` instance, it will revert because `address(this).code.length` will be nonzero. Also, because we no longer need to write to any state to track whether `initialize()` has been called, we can avoid the 20k storage gas cost. In fact, the cost for checking our own code size is only 2 gas, which means we have a 10,000x gas savings over the standard version. Pretty neat!
+Now the `Proxy` contract's constructor can still delegatecall `initialize()`, but if anyone attempts to call it again (after deployment) through the `Proxy` instance, or tries to call it directly on the `WalletLogic` instance, it will revert because `address(this).code.length` will be nonzero. Also, because we no longer need to write to any state to track whether `initialize()` has been called, we can avoid the 20k storage gas cost. In fact, the cost for checking our own code size is only 100 gas, which means we have a 200x gas savings over the standard version. Pretty neat!
 
 ## Real World Usage
 - [OpenZeppelin's upgradeable contracts](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable) all use a conventional initializer pattern.
