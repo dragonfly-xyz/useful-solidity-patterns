@@ -2,7 +2,7 @@
 - [📜 Example Code](./ApproveRestrictedWallet.sol)
 - [🐞 Tests](../../test/ApproveRestrictedWallet.t.sol)
 
-[ABI-encoding](link-to-solidity-guide) is the ubiquitous encoding scheme used throughout solidity whenever it needs to pass around arbitrary typed data through EVM constructs that only understand raw bytes. Function calls, revert errors, and unindexed event data all utilize ABI-encoding under the hood. The `abi.encode()` built-in function lets you encode your own data using this scheme.  
+[ABI-encoding](https://docs.soliditylang.org/en/v0.8.19/abi-spec.html#argument-encoding) is the ubiquitous encoding scheme used throughout solidity whenever it needs to pass around arbitrary typed data through EVM constructs that only understand raw bytes. Function calls, revert errors, and unindexed event data all utilize ABI-encoding under the hood. The `abi.encode()` built-in function lets you encode your own data using this scheme.  
 
 ```solidity
 // Encode a (uint256,address) tuple
