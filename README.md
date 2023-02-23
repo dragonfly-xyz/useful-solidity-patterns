@@ -5,6 +5,8 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
 *The code examples herein are meant to be educational. While the patterns are sound, the examples are not always designed with utmost security or robustness in mind, and sometimes will even forgo best practices in order to best illustrate a concept. They should not be deployed without an independent security review.*
 
 ## [Solidity Patterns](./patterns)
+- [ABI Decode With Selector](./patterns/abi-decode-with-selector/)
+    - Techniques for decoding function call data and revert errors. 
 - [Advanced Error Handling](./patterns/error-handling)
     - Write resilient code that intercepts and reacts to errors thrown by other contracts.
 - [Assembly Tricks (Part 1)](./patterns/assembly-tricks-1)
