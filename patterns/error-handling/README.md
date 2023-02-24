@@ -90,6 +90,8 @@ try someContract.someFunction(arg1, arg2) returns (uint256 someResult) {
 }
 ```
 
+If the revert error could be a more complex type, with distinct parameters that you want to act upon, you can check out [this guide on decoding it](../abi-decode-with-selector/).
+
 ## Manually Bubbling Up Reverts
 
 We may find that we do not want to handle certain errors and instead want them to bubble up for the caller above us to handle. Often novice solidity devs will try to re-throw the revert data with `revert()` like:
