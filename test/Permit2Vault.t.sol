@@ -44,7 +44,8 @@ contract Permit2VaultTest is TestUtils {
         vault.depositERC20(
             IERC20(address(token)),
             amount,
-            permit,
+            permit.nonce,
+            permit.deadline,
             sig
         );
         assertEq(vault.tokenBalancesByUser(owner, IERC20(address(token))), amount);
@@ -68,7 +69,8 @@ contract Permit2VaultTest is TestUtils {
         vault.depositERC20(
             IERC20(address(token)),
             amount,
-            permit,
+            permit.nonce,
+            permit.deadline,
             sig
         );
         vm.expectRevert(abi.encodeWithSelector(Permit2Clone.InvalidNonce.selector));
@@ -76,7 +78,8 @@ contract Permit2VaultTest is TestUtils {
         vault.depositERC20(
             IERC20(address(token)),
             amount,
-            permit,
+            permit.nonce,
+            permit.deadline,
             sig
         );
     }
@@ -98,7 +101,35 @@ contract Permit2VaultTest is TestUtils {
         vault.depositERC20(
             IERC20(address(token)),
             amount,
-            permit,
+            permit.nonce,
+            permit.deadline,
+            sig
+        );
+    }
+
+    function test_cannotUseOtherTokenPermit() external {
+        TestERC20 token2 = new TestERC20();
+        vm.prank(owner);
+        token2.approve(address(permit2), type(uint256).max);
+        uint256 amount = _randomUint256() % 1e18 + 1;
+        token.mint(owner, amount);
+        token2.mint(owner, amount);
+        IPermit2.PermitTransferFrom memory permit = IPermit2.PermitTransferFrom({
+            permitted: IPermit2.TokenPermissions({
+                token: IERC20(address(token2)),
+                amount: amount
+            }),
+            nonce: _randomUint256(),
+            deadline: block.timestamp
+        });
+        bytes memory sig = _signPermit(permit, address(vault), ownerKey);
+        vm.prank(owner);
+        vm.expectRevert(Permit2Clone.InvalidSigner.selector);
+        vault.depositERC20(
+            IERC20(address(token)),
+            amount,
+            permit.nonce,
+            permit.deadline,
             sig
         );
     }
@@ -119,7 +150,8 @@ contract Permit2VaultTest is TestUtils {
         vault.depositERC20(
             IERC20(address(token)),
             amount,
-            permit,
+            permit.nonce,
+            permit.deadline,
             sig
         );
         vm.prank(owner);
@@ -144,7 +176,8 @@ contract Permit2VaultTest is TestUtils {
         vault.depositERC20(
             IERC20(address(token)),
             amount,
-            permit,
+            permit.nonce,
+            permit.deadline,
             sig
         );
         vm.expectRevert();
@@ -173,7 +206,8 @@ contract Permit2VaultTest is TestUtils {
         vault.depositERC20(
             IERC20(address(badToken)),
             0,
-            permit,
+            permit.nonce,
+            permit.deadline,
             sig
         );
     }
