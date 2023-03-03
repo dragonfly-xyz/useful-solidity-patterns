@@ -26,7 +26,8 @@ contract Permit2Vault {
     function depositERC20(
         IERC20 token,
         uint256 amount,
-        IPermit2.PermitTransferFrom calldata permit,
+        uint256 nonce,
+        uint256 deadline,
         bytes calldata signature
     ) external nonReentrant {
         // Credit the caller.
@@ -34,7 +35,14 @@ contract Permit2Vault {
         // Transfer tokens from the caller to ourselves.
         PERMIT2.permitTransferFrom(
             // The permit message.
-            permit,
+            IPermit2.PermitTransferFrom({
+                permitted: IPermit2.TokenPermissions({
+                    token: token,
+                    amount: amount
+                }),
+                nonce: nonce,
+                deadline: deadline
+            }),
             // The transfer recipient and amount.
             IPermit2.SignatureTransferDetails({
                 to: address(this),
