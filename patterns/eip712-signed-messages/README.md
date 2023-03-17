@@ -79,10 +79,10 @@ function _getVoteHash(uint256 proposalId) private view returns (bytes32 hash) {
         address(this)
     ));
     // Hash of the message type and data.
-    bytes32 structHash = abi.encode(
+    bytes32 structHash = keccak256(abi.encode(
         keccak256('Vote(uint256 proposalId)'),
         proposalId
-    );
+    ));
     return keccak256(abi.encodePacked('\x19\x01', domainHash, structHash));
 }
 ```
