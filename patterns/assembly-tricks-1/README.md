@@ -4,7 +4,7 @@
 Here's a quick collection of some short and sweet assembly tricks seen in the wild which can save you significant gas and help get around some solidity shortcomings. Remember to be extremely mindful of how and when you use these techniques, as improper implementation and usage of assembly can lead to extremely bad and difficult to find bugs.
 
 ## Bubble Up Reverts
-There are some commonly used ways to make an external call to another contract (or EOA) where a revert in the call itself not cause your code (the caller) to instantly revert as well:
+There are some commonly used ways to make an external call to another contract (or EOA) where a revert in the call itself doesn't cause your code (the caller) to instantly revert as well:
 
 1. Using low-level `call()`, `delegatecall()`, `staticcall()` semantics.
 2. Using `try`/`catch` blocks.

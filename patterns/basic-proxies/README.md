@@ -107,12 +107,12 @@ function test() external returns (string memory msg) {
 ### Making Our Proxy Upgradeable
 Previously we had stored the logic contract address as a constant, `immutable` field, which embeds its value in the deployed bytecode of the proxy contract and cannot be changed. But we can make it a regular storage variable instead, which allows us to upgrade it later.
 
-When doing so, we need to be *extremely cautious* with defining storage variables in the proxy contract because the compiler is not aware that the `Proxy` and `Logic` contracts will share the same storage context and could assign storage variables in `Logic` to locations that overlap those in `Proxy` (for more context, check out the [explicit storage buckets pattern](../explicit-storage-buckets/)). Specifically for storing the logic address, the recommended approach is to follow either the [EIP-1822](https://eips.ethereum.org/eips/eip-1822) or [EIP-1967](https://eips.ethereum.org/eips/EIP-1967) specifications. Both require using a fixed, explicit (not compiler-assigned) storage slot to store the logic contract address, which we can access with some simple assembly. So to make our proxy conform to EIP-1967, we would do something like:
+When doing so, we need to be *extremely cautious* with defining storage variables in the proxy contract because the compiler is not aware that the `Proxy` and `Logic` contracts will share the same storage context and could assign storage variables in `Logic` to locations that overlap those in `Proxy` (for more context, check out the [explicit storage buckets pattern](../explicit-storage-buckets/)). Specifically for storing the logic address, the recommended approach is to follow either the [EIP-1822](https://eips.ethereum.org/EIPS/eip-1822) or [EIP-1967](https://eips.ethereum.org/EIPS/eip-1967) specifications. Both require using a fixed, explicit (not compiler-assigned) storage slot to store the logic contract address, which we can access with some simple assembly. So to make our proxy conform to EIP-1967, we would do something like:
 
 ```solidity
 address immutable owner;
 // explicit storage slot for logic contract address.
-uint256 constant EIP9167_LOGIC_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
+uint256 constant EIP1967_LOGIC_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
 
 event Upgraded(address indexed logic); // required by EIP-1967
 
@@ -132,14 +132,14 @@ fallback(bytes calldata callData)
     returns (bytes memory resultData)
 {
     address logic;
-    assembly { logic := sload(EIP9167_LOGIC_SLOT) }
+    assembly { logic := sload(EIP1967_LOGIC_SLOT) }
     (bool success, bytes memory resultData) = logic.delegatecall(callData);
     // ...same as before
 }
 
 function _setlogic(address logic) private {
     emit Upgraded(logic);
-    assembly { sstore(EIP9167_LOGIC_SLOT, logic) }
+    assembly { sstore(EIP1967_LOGIC_SLOT, logic) }
 }
 ```
 
@@ -189,7 +189,7 @@ A contract's constructor only gets called when that contract is being deployed, 
 
 Initialization functions carry some risk. Extreme care must be taken to ensure these initialization functions are guarded so that they cannot be called again. Otherwise someone could, for example, reinitialize your contract, replacing critical configuration options that grant them special privileges.
 
-#### Operational Security
+### Operational Security
 The upgrade mechanism of a contract can and should be permissioned to an admin account. The admin account can completely change the logic behind a proxy, making for an easy rug, so that admin account can become extremely attractive for hackers to target. Often projects will put the admin account behind a multisig to mitigate the impact of a compromise, but that is only as secure as the practices followed by the multisig signers. As another line of defense, the upgrade function can be time-locked and monitored so that users and maintainers have time to respond to a malicious logic change.
 
 ## The Example
