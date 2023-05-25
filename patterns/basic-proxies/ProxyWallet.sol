@@ -6,7 +6,7 @@ contract WalletProxy {
     // Who can upgrade the logic.
     address immutable public owner;
     // explicit storage slot for logic contract address, as per EIP-1967.
-    uint256 constant EIP9167_LOGIC_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
+    uint256 constant EIP1967_LOGIC_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
 
     event Upgraded(address indexed logic); // required by EIP-1967
 
@@ -23,7 +23,7 @@ contract WalletProxy {
 
     fallback(bytes calldata callData) external payable returns (bytes memory resultData) {
         address logic;
-        assembly { logic := sload(EIP9167_LOGIC_SLOT) }
+        assembly { logic := sload(EIP1967_LOGIC_SLOT) }
         bool success;
         (success, resultData) = logic.delegatecall(callData);
         if (!success) {
@@ -38,7 +38,7 @@ contract WalletProxy {
 
     function _setlogic(address logic) private {
         emit Upgraded(logic);
-        assembly { sstore(EIP9167_LOGIC_SLOT, logic) }
+        assembly { sstore(EIP1967_LOGIC_SLOT, logic) }
     }
 }
 
