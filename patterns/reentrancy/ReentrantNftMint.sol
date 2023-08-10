@@ -22,7 +22,7 @@ contract GuardedNftSale is RestrictedNftSaleBase {
         RestrictedNftSaleBase(allowList)
     {}
 
-    modifer nonReentrant() {
+    modifier nonReentrant() {
         require(!_lock, 'reentered');
         _lock = true; _; _lock = false;
     }
