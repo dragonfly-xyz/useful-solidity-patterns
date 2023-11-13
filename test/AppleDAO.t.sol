@@ -33,7 +33,7 @@ contract AppleDAOTest_DumbAlice is AppleDAOTestBase {
     function test_canExploitAlice() external {
         assertEq(apples.balanceOf(address(bob)), 0);
         bob.exploit();
-        assertEq(apples.balanceOf(address(bob)), 100);
+        assertEq(apples.balanceOf(address(bob)), 10);
     }
 }
 

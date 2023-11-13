@@ -57,8 +57,8 @@ contract Bob {
     }
 
     function _claim() private {
-        // Keep claiming apples until we have 100.
-        if (ALICE.APPLES().balanceOf(address(this)) < 100) {
+        // Keep claiming apples until we have 10.
+        if (ALICE.APPLES().balanceOf(address(this)) < 10) {
             ALICE.claimApple();
         }
     }

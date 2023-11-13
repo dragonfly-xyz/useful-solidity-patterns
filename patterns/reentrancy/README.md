@@ -1,7 +1,7 @@
 # Reentrancy
 
-- [📜 Example Code](./ReentrantLoans.sol)
-- [🐞 Tests](../../test/ReentrantLoans.t.sol)
+- [📜 Example Code](./AppleDAO.sol)
+- [🐞 Tests](../../test/AppleDAO.t.sol)
 
 Virtually all protocol contracts will make some form of an external call, either directly or indirectly, to an untrusted, uncontrolled address. Any time an external call is made, execution control is lost to another party, which may be untrusted or unknowable. There is no concept of parallelism in Ethereum contracts, so when a protocol loses execution control in the middle of an operation that has yet to finish, it must wait for the executor to return and opens itself up to the notorious reentrancy attack.
 
@@ -128,4 +128,4 @@ The reentrancy guard approach is pretty convenient and easy to reason about, whi
 - The naive version of a reentrancy guard can only protect reentrancy within a single contract. Protocols are often composed of several contracts with mutually exclusive operations across them. In these situations, you may need to come up with a way to share reentrancy guard state with the rest of the system.
 
 ## The Demo
-The [demo](./ReentrantLoans.sol) is a fictional lending protocol that should never be deployed because it is vulnerable to a reentrancy exploit. In the same file, fixed versions of the protocol are proposed.
+The [demo](./AppleDAO.sol) is the complete implementation of the scenario and solutions described here. An abridged and simplified version of an ERC721 style token contract is used for brevity. You can inspect the traces of the [tests](.../../test/AppleDAO.t.sol) with `forge test -vvvv --match-path test/AppleDAO.t.sol` to get a better understanding of the flow of execution.
