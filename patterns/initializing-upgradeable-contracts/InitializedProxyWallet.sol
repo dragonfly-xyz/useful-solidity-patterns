@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 // A proxy contract that delegatecalls all calls to it to an underlying logic
 // contract. An arbitrary initialization delegatecall can be made in the

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 // A contract that users grant an ERC20 allowance to, via approve() mechanism.
 // Other (authorized) contracts in the protocol can call `spendFrom()`

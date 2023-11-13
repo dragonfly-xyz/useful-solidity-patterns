@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 // A king of the hill game where each new king must pay the old king
 // more than they paid. Vulnerable to a DoS attack if the old king

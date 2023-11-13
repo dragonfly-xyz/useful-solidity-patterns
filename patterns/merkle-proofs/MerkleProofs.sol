@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 // Distribute ether to a group of addresses using a merkle proofs.
 contract MerkleDrop {

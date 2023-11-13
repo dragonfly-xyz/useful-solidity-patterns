@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 // A communal wallet for managing ERC20s and ETH that can be deposited (staked)
 // and withdrawn (unstaked) from ERC4626 vaults.

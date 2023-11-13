@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 // An "NFT" contract that holds a sealed bid auction every 24 hours for the right
 // to mint a token. The auction is a sealed auction using commit reveal to hide

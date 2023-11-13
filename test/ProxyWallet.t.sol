@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 import "../patterns/basic-proxies/ProxyWallet.sol";
 import "./TestUtils.sol";

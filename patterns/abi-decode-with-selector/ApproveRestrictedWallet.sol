@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 // Abstract base for common functionality between
 // `ApproveRestrictedWallet` and `ApproveRestrictedWallet_Memory`.

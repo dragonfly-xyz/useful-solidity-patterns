@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 abstract contract DelegateCallModifiers {
     // The true address of this contract. Where the bytecode lives.
