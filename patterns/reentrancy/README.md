@@ -1,119 +1,131 @@
 # Reentrancy
 
-- [📜 Example Code](./ReentrantNftMint.sol)
-- [🐞 Tests](../../test/ReentrantNftMint.t.sol)
+- [📜 Example Code](./ReentrantLoans.sol)
+- [🐞 Tests](../../test/ReentrantLoans.t.sol)
 
-- Execution control.
-- How you can lose it.
-    - External function calls.
-    - ETH transfers.
-    - Tokens with callbacks.
-- What constitutes reentrancy.
-- Issues and examples.
-    - Incomplete/uncommitted state.
-    - Normal reentrancy (DAO).
-        - Probably the singular hack that kicked off modern smart contract security efforts.
-    - Indirect reentrancy.
-    - Read-only reentrancy (curve).
-- Solutions
-- Reentrancy Guards
-    - Example
-- Check-Effects-Interactions Pattern
-    - Plus invariant checking.
-- Demo
+Virtually all protocol contracts will make some form of an external call, either directly or indirectly, to an untrusted, uncontrolled address. Any time an external call is made, execution control is lost to another party, which may be untrusted or unknowable. There is no concept of parallelism in Ethereum contracts, so when a protocol loses execution control in the middle of an operation that has yet to finish, it must wait for the executor to return and opens itself up to the notorious reentrancy attack.
 
-Virtually all contracts will have to make an external call to an uncontrolled address at some point. When this happens, your contract loses execution control until the call returns. If the call is not read-only (`view` or `pure`), the called address is generally free to perform any state altering operations it wants, including further operations on your own contract(s). If you aren't anticipating this behavior, you may be vulnerable to a classic reentrancy attack.
+External calls can come in the obvious form of a simple call to a function on a contract, the less obvious transfer of ETH to an address (which is just an empty call), or the extra sneaky call to a trusted contract that implements a callback or hook mechanism (such as ERC777 and ERC721 tokens).
 
-## What is a Reentrancy Attack?
-There are much better [guides](???) on reentrancy attacks from more security-focused resources, but let's briefly explain them for the uninitiated.
+## Losing All Your Apples
 
-The anatomy of a classic reentrancy attack follows an external call that calls back into the calling contract ("reentered") in order to exploit some incomplete state.
+Imagine your protocol is Alice, who is handing out apples to people, but only one per person. Unfortunately, Alice is also suffering from short-term memory loss and must write everything down to remember it. Now Bob comes along, who is greedy and actually wants *2 apples*! How can he trick Alice into getting them?
 
-![reentrancy flow]()
+1. Bob asks Alice for an apple.
+2. Alice checks her notebook to see if she's already given Bob an apple, sees that she hasn't, and hands over an apple to Bob.
+    1. Before Alice can write down that she has given Bob an apple (!), Bob immediately asks Alice for another apple.
+    2. Alice again checks her notebook and sees Bob hasn't received an apple, so she hands him another.
+    3. Alice now checks Bob's name off in her notebook, indicating he's received an apple.
+3. Alice (again) checks Bob's name off in her notebook, indicating he's received an apple.
 
-In the broader definition, the contract and function being reentered don't have to be the same as in the initial operation. All that matters is that they depend on some shared state.
+Taking it further, if Bob wanted ALL of Alice's apples, he could simply keep nesting requests for apples before Alice gets a chance to record the exchange until she ran out. This is exactly how the infamous [DAO hack](https://www.immunebytes.com/blog/an-insight-into-the-dao-attack/) was carried out.
 
-
-## Losing Execution Control
-
-The way a contract typically loses execution control is through an external function call to another contract, so it may make sense to vet the contract being called to ensure it doesn't perform a reentrant call. But even if you do trust the contract being called, that contract may end up calling another contract that you *haven't* vetted. This has been an especially painful lesson since the rise of tokens that have receiver callbacks on transfer.
-
-An extremely common, but less obvious, example of an external call that result in a loss of execution control is in the case of ETH transfers. ETH transfers (that aren't `selfdestruct`s) are accomplished through a naked function call, but the solidity language provides high-level `send()` and `transfer()` helpers to abstract the mechanism away, as do many other third-party libraries. So you should approach ETH transfers with the same caution as external calls.
-
-
-## Normal
-
-
-Smart contracts frequently (intentionally or unintentionally) have to interact with other contracts outside of the control of the author. Every call to a contract will result in a loss of execution One of the most common hacks in smart contracts center around reentrancy. At its core, reentrancy is about losing execution control
-
-When contracts need to store arbitrary data they will usually declare a `bytes` or `string` storage variable and write to it. This uses contract storage, which is straightforward and intuitive but can become prohibitively expensive for larger data. Contract storage is slot-based, charging 20k gas per word (32 bytes) of data to initialize for the first time. To store 256 bytes this way would cost 160k gas.
-
-But if you don't need the ability to change the data, there's a cheaper on-chain location to store arbitrary data that contracts can still access.
-
-
-## Contract Bytecode
-The bytecode for a contract also lives on-chain, in a separate code storage location. This location is intended to hold the contract's executable bytecode, along with any compile-time constants and `immutable` variables. But there is a way to store arbitrary data in this code storage location as well.
-
-Unlike normal contract storage, data in code storage can only be set once, during contract initialization/creation. It is also limited to ~24KB. However, gas costs can be much lower when storing large data (several words). The cost to initialize data in code storage is a more complex formula and depends on your exact implementation, but you can roughly approximate it with:
-
-```
-total_cost = 32k + mem_expansion_cost + code_deposit_cost
-mem_expansion_cost = size * 3 + (size ** 2) / 512
-code_deposit_cost = 200 * size
-```
-
-So, to store 256 bytes of data in contract bytecode would cost only 84k, compared to the 160k for conventional contract storage, which is almost half the cost! The savings go up as the size of the data increases.
-
-## How It Works
-But how do we store arbitrary data (not code) in bytecode storage? During contract deployment, the constructor runs first. The constructor is part of a contract's initialization process, often setting up state variables. But what solidity abstracts away from you is that after the constructor runs, it also returns data that will make up the contract's permanent bytecode. This data is exactly what will get stored in the contract's code storage.
-
-By dropping into assembly, you can preempt the compiler's built-in return to return whatever data you want stored in code storage. 
+What would Alice and Bob look like in Solidity? Let's say apples are actually ERC721 NFTs that Alice is in charge of minting.
 
 ```solidity
-contract StoreString {
-    constructor(string memory s) {
-        // Store the string in the contract's code storage.
-        assembly {
-            return(
-                add(s, 0x20), // start of return data
-                mload(s) // size of return data
-            )
-        }
+contract Apples is ERC721("Apples") { /* ... */ }
+
+contract Alice {
+    Apples public immutable APPLES = new Apples();
+    mapping (address => boolean) _hasReceivedApple;
+
+    function claimApple() external {
+        require(!_hasReceivedApple[msg.sender]);
+        // safeMint() calls the receiver's onERC721Received() handler. 
+        APPLES.safeMint(msg.sender);
+        _hasReceivedApple[msg.sender] = true;
+    }
+}
+
+contract Bob {
+    function exploit(Alice alice) external {
+        _claim(alice);
+    }
+
+    function onERC721Received(address operator, address, uint256, bytes calldata) external {
+        _claim(Alice(operator));
+        return this.onERC721Received.selector;
+    }
+
+    function _claim(Alice alice) private {
+        // Stop claiming once we have 100 apples.
+        if (alice.APPLES().balanceOf(address(this)) < 100) {
+            alice.claimApple();
+        }    
+    }
+}
+
+```
+
+*⚠️ Note that this is just one, relatively simple, example of what a reentrancy attack could look like. The actual topology can vary greatly, involving more or less intermediary contracts/actors. It's also important to be aware that reentrancy is often spoken about at the individual contract level, but it can manifest itself at the protocol level when an operation spans multiple contracts (or even multiple protocols). Reentrancy attacks can also (and often does) exploit multiple functions/operations that expect the same shared state to be consistent.*
+
+
+## Protecting Your Apples
+
+Let's see how we can apply two common patterns/mechanisms to help keep Alice from being exploited.
+
+### Checks-Effects-Interactions Pattern
+The "Checks-Effects-Interactions" (abbreviated to just "CEI") pattern is basically a mantra for organizing the logic in your operation to minimize reentrancy opportunities. It also often has a nice side effect of making your code easier to follow, which helps with security reviews, so you should considering applying the technique even when you're confident the impact of a reentrancy attack is negligible. Most seasoned solidity devs do it by reflex.
+
+The sequence goes as follows:
+
+1. **Checks**: Verify inputs, access control, and initial state for the function/operation.
+2. **Effects**: Perform any internal accounting and commit any state changes to storage that would be affected by the operation.
+3. **Interactions**: Make untrusted/external calls and asset transfers.
+
+If we look at the Alice example, she actually does all these things but in the wrong order! Instead of C-E-I, she does C-I-E. Correcting the order removes the reentrancy vulnerability because she will have already recorded that Bob received an apple before he gets the opportunity to request another.
+
+```solidity
+contract Alice {
+    ...
+    function claimApple() external {
+        // CHECKS: Sender hasn't received an apple yet.
+        require(!_hasReceivedApple[msg.sender]);
+        // EFFECTS: Record that the sender has claimed an apple.
+        _hasReceivedApple[msg.sender] = true;
+        // INTERACTIONS: Give the sender an apple.
+        APPLES.safeMint(msg.sender);
+    }
+}
+
+```
+
+### Reentrancy Guards (Mutex)
+Sometimes you can't organize your code according to CEI. Maybe you depend on the output of an external interaction to compute the final state to be committed. In these cases, you can use some form of a reentrancy guard.
+
+Reentrancy guards are essentially temporary state that indicates an operation is ongoing, which you can check to prevent two mutually exclusive operations (or the same operation) from occurring before the first one has completed. Many contracts use a dedicated storage variable as this mutex (see the [standard OpenZeppelin implementation](https://docs.openzeppelin.com/contracts/4.x/api/security#ReentrancyGuard)) and share it across any at-risk functions, usually in the form of a convenient modifier that asserts the reentrancy flag, toggles on the flag, executes the function body, then resets the flag.
+
+
+```solidity
+contract Alice {
+    ...
+    bool private _reentrancyGuard;
+
+    modifier nonReentrant() {
+        require(!_reentrancyGuard);
+        _reentrancyGuard = true;
+        _;
+        _reentrancyGuard = false;
+    }
+
+    // Unaltered, vulnerable code from original example but with reentrancy guard
+    // modifier added.
+    function claimApple() external nonReentrant {
+        require(!_hasReceivedApple[msg.sender]);
+        APPLES.safeMint(msg.sender);
+        _hasReceivedApple[msg.sender] = true;
+
     }
 }
 ```
 
-Afterwards, if you tried to access the deployed address' code data, you would get back the arbitrary data stored there. So to access that data again, you just need to remember the deployed address.
+Now if Bob attempts to call `claimApple()` again inside of another, the modifier will see that the reentrancy guard is activated and the call will revert.
 
-```solidity
-address(new StoreString("hello, world")).code // "hello, world" 
-```
+The reentrancy guard approach is pretty convenient and easy to reason about, which makes it a very popular solution. However, it comes with some considerations.
 
-## Preventing Accidental Execution
-Even though the data you're storing in code storage with this method is probably not actual bytecode, the EVM can't tell the difference. So *any* calls to the address will attempt to execute the data stored there as bytecode, starting with the first byte. It is possible that a sequence of starting arbitrary bytes is, intentionally or unintentionally, valid bytecode and could cause some meaningful interaction if executed. For example, if the data started with `33FF`, anyone could call the contract and it would self-destruct, taking the data with it. For this reason, it's a good idea to prefix the data with something that causes execution to halt. The `00` byte is a good candidate because it is also the `STOP` opcode, which ends execution immediately, but `FE` (`INVALID`) also works well.
-
-```solidity
-contract StoreString {
-    constructor(string memory s) {
-        // Store the string in the contract's code storage.
-        // Prefix with STOP opcode to prevent execution.
-        bytes memory p = abi.encodePacked(hex"00", s);
-        assembly {
-            return(
-                add(p, 0x20), // start of return data
-                mload(p) // size of return data
-            )
-        }
-    }
-}
-```
-
-But don't forget to discard this prefix when reading the data back later!
+- Writing to a new storage slot (especially an empty one) introduces significant gas cost. Even though the majority of it will be refunded (because the slot is reset by the modifier), it raises the execution gas limit of the transaction which causes some extra sticker shock to users.
+    - Sometimes you can avoid using a dedicated reentrancy guard state variable. Instead you can reuse a state variable that you would write to during the operation anyway, checking and setting it to some preordained invalid value that would act the same way a dedicated reentrancy guard would.
+- The naive version of a reentrancy guard can only protect reentrancy within a single contract. Protocols are often composed of several contracts with mutually exclusive operations across them. In these situations, you may need to come up with a way to share reentrancy guard state with the rest of the system.
 
 ## The Demo
-The [demo](./OnChainPfp.sol) loosely implements an NFT which can be minted with a user-provided image that's stored permanently on-chain. The `mint()` function will trigger code storage of a base64-encoded PNG image. `tokenURI()` will later read the code data at the deployed address and will embed the image in the URI using [RFC3986](https://www.rfc-editor.org/rfc/rfc3986) semantics.
-
-
-## References
-- [SSTORE2 library](https://github.com/0xsequence/sstore2)
-    - A ready-to-use solidity library for various forms of code data storage, including a keyed variant that has predictable storage addresses.
+The [demo](./ReentrantLoans.sol) is a fictional lending protocol that should never be deployed because it is vulnerable to a reentrancy exploit. In the same file, fixed versions of the protocol are proposed.

@@ -1,4 +1,4 @@
-//  SPDX-License-Identifer: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
 // A communal wallet for managing ERC20s and ETH that can be deposited (staked)
