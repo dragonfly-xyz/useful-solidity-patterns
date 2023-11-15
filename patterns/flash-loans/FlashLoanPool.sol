@@ -24,9 +24,9 @@ interface IBorrower {
     ) external;
 }
 
-
+// A simple flash loan protocol with a single depositor/withdrawer (OWNER).
 contract FlashLoanPool {
-    uint16 public constant FEE_BPS = 0.001e4;
+    uint16 public constant FEE_BPS = 0.001e4; // 0.1% fee.
     address public immutable OWNER;
 
     constructor(address owner) { OWNER = owner; }
@@ -61,7 +61,7 @@ contract FlashLoanPool {
         );
         // Check that all the tokens were returned + fee.
         uint256 balanceAfter = token.balanceOf(address(this));
-        require(balanceAfter == balanceBefore + fee, 'not repaid');
+        require(balanceAfter >= balanceBefore + fee, 'not repaid');
     }
 
     // Withdraw tokens from this contract to the contract owner.
