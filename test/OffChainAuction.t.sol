@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 import "forge-std/Test.sol";
 import "solmate/tokens/ERC721.sol";

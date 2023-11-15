@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 // Trivial vault that allows users to deposit ERC20 tokens then claim them later.
 contract Permit2Vault {

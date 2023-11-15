@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 // A proxy contract that delegatecalls incoming calls to an implementation contract.
 // Vulnerable because the implementation contract overlaps the same storage slots

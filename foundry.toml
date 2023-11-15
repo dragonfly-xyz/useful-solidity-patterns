@@ -2,5 +2,6 @@
 src = 'patterns'
 out = 'out'
 libs = ['lib']
+ignored_error_codes=[3628,5159]
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config

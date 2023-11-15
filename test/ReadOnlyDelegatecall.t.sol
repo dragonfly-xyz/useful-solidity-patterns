@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 import "../patterns/readonly-delegatecall/ReadOnlyDelegatecall.sol";
 import "./TestUtils.sol";

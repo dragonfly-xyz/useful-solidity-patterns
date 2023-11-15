@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 import "solmate/tokens/ERC20.sol";
 import "../patterns/permit2/Permit2Vault.sol";

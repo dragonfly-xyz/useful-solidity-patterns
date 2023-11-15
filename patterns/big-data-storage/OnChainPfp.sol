@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 // An ERC721-like NFT contract where users can mint a token with
 // custom image metadata, stored on-chain.

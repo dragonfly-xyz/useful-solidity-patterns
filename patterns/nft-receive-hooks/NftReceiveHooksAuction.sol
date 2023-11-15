@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 // A simple ERC721 auction house that uses the `onERC721Received()` hook
 // to create auctions with a single transfer transaction.

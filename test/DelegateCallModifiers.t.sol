@@ -1,4 +1,4 @@
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 import "../patterns/only-delegatecall-no-delegatecall/DelegateCallModifiers.sol";
 import "./TestUtils.sol";

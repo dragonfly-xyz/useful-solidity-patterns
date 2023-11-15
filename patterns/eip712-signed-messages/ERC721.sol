@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 // Basic ERC721 contract that supports minting a specific token ID.
 contract ERC721 {

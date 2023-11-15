@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 import "../patterns/big-data-storage/OnChainPfp.sol";
 import "./TestUtils.sol";

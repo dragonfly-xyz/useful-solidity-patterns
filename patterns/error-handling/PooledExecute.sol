@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 // Allows strangers to pool their ETH together to attach to a single arbitrary call
 // that will be made once enough ETH is raised.

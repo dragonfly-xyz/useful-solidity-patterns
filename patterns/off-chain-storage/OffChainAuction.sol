@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.23;
 
 // Creates auctions for an ERC721 NFT with off-chain storage for auction state.
 contract OffChainAuction {
