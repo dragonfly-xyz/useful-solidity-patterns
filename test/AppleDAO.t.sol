@@ -21,6 +21,13 @@ contract AppleDAOTestBase is TestUtils {
         assertEq(apples.balanceOf(address(this)), 1);
     }
 
+    function test_cannotClaimAppleTwice() external {
+        assertEq(apples.balanceOf(address(this)), 0);
+        alice.claimApple();
+        vm.expectRevert('already got an apple');
+        alice.claimApple();
+    }
+
     function onNftReceived(address owner, uint256) external {
         assertEq(owner, address(0));
         assertEq(msg.sender, address(apples));
