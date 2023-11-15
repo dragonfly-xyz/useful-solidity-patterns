@@ -31,6 +31,8 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
     - The consequences of interacting with contracts vs regular wallets, and how to identify them.
 - [Factory Proofs](./patterns/factory-proofs)
     - Proving on-chain that a contract was deployed by a trusted deployer.
+- [Flash Loans](./patterns/flash-loans/)
+    - Designing a basic flash loan mechanism.
 - [Initializing Upgradeable Contracts](./patterns/initializing-upgradeable-contracts)
     - Methods to safely and efficiently initialize state for proxy contracts.
 - [Merkle Proofs](./patterns/merkle-proofs)
@@ -49,6 +51,8 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
     - Transfer tokens securely without a direct allowance, in a way that works for all (legacy and modern) ERC20s.
 - [Read-Only Delegatecall](./patterns/readonly-delegatecall)
     - Execute arbitrary delegatecalls in your contract in a read-only manner, without side-effects.
+- [Reentrancy](./patterns/reentrancy)
+    - Explaining reentrancy vulnerabilities and patterns for addressing them.
 - [Separate Allowance Targets](./patterns/separate-allowance-targets/)
     - Avoid having to migrate user allowances between upgrades with a dedicated approval contract.
 - [Stack-Too-Deep Workarounds](./patterns/stack-too-deep/)
