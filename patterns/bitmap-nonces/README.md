@@ -107,4 +107,4 @@ You can find bitmap nonces being used in major protocols such as Uniswap's [Perm
 
 ## The Demo
 
-The full, working example can be found [here](./TransferRelay.sol) with complete tests detailing its usage [here](../../test/TransferRelay.sol).
+The full, working example can be found [here](./TransferRelay.sol) with complete tests detailing its usage and gas savings [here](../../test/TransferRelay.sol).
