@@ -15,6 +15,8 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
     - Contracts with upgradeable logic.
 - [Big Data Storage (SSTORE2)](./patterns/big-data-storage)
     - Cost efficient on-chain storage of multi-word data accessible to contracts.
+- [Bitmap Nonces](./patterns/bitmap-nonces/)
+    - Efficiently tracking the state of many operations identifiable by a unique nonce.
 - [Commit + Reveal](./patterns/commit-reveal)
     - A two-step process for performing partially obscured on-chain actions that can't be front or back runned.
 - [EIP712 Signed Messages](./patterns/eip712-signed-messages)
@@ -52,7 +54,7 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
 - [Read-Only Delegatecall](./patterns/readonly-delegatecall)
     - Execute arbitrary delegatecalls in your contract in a read-only manner, without side-effects.
 - [Reentrancy](./patterns/reentrancy)
-    - Explaining reentrancy vulnerabilities and patterns for addressing them.
+    - Explaining reentrancy vulnerabilities and patterns for addressing them (Checks-Effects-Interactions and reentrancy guards).
 - [Separate Allowance Targets](./patterns/separate-allowance-targets/)
     - Avoid having to migrate user allowances between upgrades with a dedicated approval contract.
 - [Stack-Too-Deep Workarounds](./patterns/stack-too-deep/)

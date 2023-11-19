@@ -101,10 +101,8 @@ contract TransferRelay {
 }
 ```
 
-## In the Wild
+## Final Thoughts
 
-You can find bitmap nonces being used in major protocols such as Uniswap's [Permit2](https://github.com/Uniswap/permit2/blob/cc56ad0f3439c502c246fc5cfcc3db92bb8b7219/src/SignatureTransfer.sol#L142) and 0x's [Exchange Proxy](https://github.com/0xProject/protocol/blob/e66307ba319e8c3e2a456767403298b576abc85e/contracts/zero-ex/contracts/src/features/nft_orders/ERC721OrdersFeature.sol#L662).
-
-## The Demo
-
-The full, working example can be found [here](./TransferRelay.sol) with complete tests demonstrating its usage and gas savings [here](../../test/TransferRelay.sol).
+- You can find bitmap nonces being used in major protocols such as Uniswap's [Permit2](https://github.com/Uniswap/permit2/blob/cc56ad0f3439c502c246fc5cfcc3db92bb8b7219/src/SignatureTransfer.sol#L142) and 0x's [Exchange Proxy](https://github.com/0xProject/protocol/blob/e66307ba319e8c3e2a456767403298b576abc85e/contracts/zero-ex/contracts/src/features/nft_orders/ERC721OrdersFeature.sol#L662).
+- There is no reason you couldn't track operations that have more than 2 states using bitmap nonces. You would just simply increase the number of bits in a word assigned to each operation and adjust the mapping formula accordingly.
+- The full, working example can be found [here](./TransferRelay.sol) with complete tests demonstrating its usage and gas savings [here](../../test/TransferRelay.sol).
