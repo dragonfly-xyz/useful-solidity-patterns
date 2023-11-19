@@ -16,7 +16,7 @@ This repo is an ongoing collection of useful, and occasionally clever, solidity/
 - [Big Data Storage (SSTORE2)](./patterns/big-data-storage)
     - Cost efficient on-chain storage of multi-word data accessible to contracts.
 - [Bitmap Nonces](./patterns/bitmap-nonces/)
-    - Efficiently tracking the state of many operations identifiable by a unique nonce.
+    - Efficiently tracking on-chain the state of frequent, consumable operations identifiable by a unique nonce.
 - [Commit + Reveal](./patterns/commit-reveal)
     - A two-step process for performing partially obscured on-chain actions that can't be front or back runned.
 - [EIP712 Signed Messages](./patterns/eip712-signed-messages)
