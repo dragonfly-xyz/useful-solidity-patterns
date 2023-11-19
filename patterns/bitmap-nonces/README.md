@@ -3,11 +3,11 @@
 - [📜 Example Code](./TransferRelay.sol)
 - [🐞 Tests](../../test/TransferRelay.t.sol)
 
-What do filling a stop-loss order, executing a governance proposal, or meta transactions have in common? They're all operations meant to be consumed once and only once. This guarantee needs to be enforced on-chain to prevent replay attacks. To do this, many protocols will derive some unique identifier from the operation's parameters, then map that identifier to a storage slot dedicated to that operation which holds a status flag.
+What do filling a stop-loss order, executing a governance proposal, or meta transactions have in common? They're all operations meant to be consumed once and only once. You'll find these kinds of operations across many major protocols. This single-use guarantee needs to be enforced on-chain to prevent replay attacks. To do this, many protocols will derive some unique identifier (nonce) for the operation then map that identifier to a storage slot dedicated to that operation which holds a status flag indicating whether its been consumed or not.
 
-## Naive Approach
+## The Naive Approach
 
-Take the following example of a protocol that executes off-chain signed messages to transfer (compliant) ERC20 tokens on behalf of the signer after a given time:
+Take the following example of a contract that executes off-chain signed messages to transfer (compliant) ERC20 tokens on behalf of the signer after a given time:
 
 ```solidity
 contract TransferRelay {
@@ -45,21 +45,21 @@ contract TransferRelay {
 }
 ```
 
-We expect the signer to choose a `nonce` value that is unique across all their messages. Our contract uses this `nonce` value to identify and record the status of the message in the `isSignerNonceConsumed` mapping. Pretty straight-forward and intuitive... but we can do better!
+We expect the signer to choose a `nonce` value that is unique across all their messages. Our contract uses this `nonce` value to uniquely identify the message and record its status in the `isSignerNonceConsumed` mapping. Pretty straight-forward and intuitive... but we can do better!
 
-## Looking At Gas costs
+## Examining Gas costs
 
-Let's look at the gas cost associated with this operation. Because every `Message.nonce` maps to a unique storage slot, we write to an **empty** slot each time a message gets consumed. Writing to an empty storage slot costs 20k(\*) gas. This can represent 15% of the total gas cost for a simple AMM swap. For high frequency defi operations, the costs can add up. In contrast, writing to a non-empty storage slot only costs 3k(\*) gas. Bitmap nonces minimize how often we write to empty slots, cuting down the cost down by 85% for 99% of operations.
+Let's look at the gas cost associated with marking a message consumed. Because every `Message.nonce` maps to a unique storage slot, we will write to an **empty** slot each time a message gets consumed. Writing to an empty storage slot costs 20k(\*) gas. For context, this can represent 15% of the total gas cost for a simple AMM swap. Especially for high frequency defi operations, the costs can add up. In contrast, writing to a *non-empty* storage slot only costs 3k(\*) gas. Bitmap nonces can minimize how often we write to empty slots, cutting down this cost down by 85% for most operations.
 
 *(\*) Not accounting for EIP-2929 cold/warm state access costs.*
 
 ## One More Time, With Bitmap Nonces
 
-If we think about it, we don't need a whole 32-byte word, or even a whole  8-bit boolean to represent whether a message was consumed; we only need one bit (`0` or `1`). Therefore, if we wanted to minimize the frequency of writes to empty slots, instead of mapping nonces to entire storage slots, we could map nonces to bit positions within storage slots. Each storage slot is a 32-byte word so we have 256 bits to work with before we have to move on to a different slot.
+If we think about it, we don't need a whole 32-byte word, or even a whole  8-bit boolean to represent whether a message was consumed. We only need one bit (`0` or `1`). So if we wanted to minimize the frequency of writes to empty slots, instead of mapping nonces to an *entire* storage slot, we could map nonces to bit positions within a storage slot. Each storage slot in the EVM is a 32-byte word so we can fit the status of 256 operations inside a single storage slot before we have to move on to the next.
 
-![nonces slot usage](./???.png)
+![nonces slot usage](./nonces-slots.drawio.svg)
 
-We accomplish this by mapping the upper 248 bits of the `nonce` to a unique slot (similar to before), then mapping the lower 8 bits to a bit inside that slot. If the user assigns nonces to operations incrementally instead of randomly they will only write to a new slot every 255 operations!
+The addressing is done by mapping the upper 248 bits of the `nonce` to a unique slot (similar to before), then map the lower 8 bits to a bit offset inside that slot. If the user assigns nonces to operations incrementally (1, 2, 3, ...) instead of randomly then they will only write to a new slot every 255 operations.
 
 Let's apply bitmap nonces to our contract:
 
@@ -107,4 +107,4 @@ You can find bitmap nonces being used in major protocols such as Uniswap's [Perm
 
 ## The Demo
 
-The full, working example can be found [here](./TransferRelay.sol) with complete tests detailing its usage and gas savings [here](../../test/TransferRelay.sol).
+The full, working example can be found [here](./TransferRelay.sol) with complete tests demonstrating its usage and gas savings [here](../../test/TransferRelay.sol).
