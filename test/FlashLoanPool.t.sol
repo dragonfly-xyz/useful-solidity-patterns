@@ -161,7 +161,7 @@ contract FlashLoanPoolTest is TestUtils, FlashLoanValidator {
     }
     
     function _getFee(uint256 amount) private view returns (uint256) {
-        return pool.FEE_BPS() * (amount + 1e4-1) / 1e4;
+        return (pool.FEE_BPS() * amount + 1e4-1) / 1e4;
     }
 
     function test_canWithdraw() external {
