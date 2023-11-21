@@ -48,7 +48,7 @@ contract FlashLoanPool {
         uint256 balanceBefore = token.balanceOf(address(this));
         require(balanceBefore >= borrowAmount, 'too much');
         // Compute the fee, rounded up.
-        uint256 fee = FEE_BPS * (borrowAmount + 1e4-1) / 1e4;
+        uint256 fee = (FEE_BPS * borrowAmount + 1e4-1) / 1e4;
         // Transfer tokens to the borrower contract.
         token.transfer(address(borrower), borrowAmount);
         // Let the borrower do its thing.
