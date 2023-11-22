@@ -98,8 +98,8 @@ contract SealedAuctionMint {
         return (block.timestamp - launchTime) / AUCTION_COMMIT_DURATION + 1;
     }
 
-    function getAuctionStartTime(uint256 auctionId) public pure returns (uint256 startTime) {
-        return ((auctionId - 1) * AUCTION_COMMIT_DURATION) + startTime;
+    function getAuctionStartTime(uint256 auctionId) public view returns (uint256 startTime) {
+        return ((auctionId - 1) * AUCTION_COMMIT_DURATION) + launchTime;
     }
 
     function isAuctionOver(uint256 auctionId) public view returns (bool) {
