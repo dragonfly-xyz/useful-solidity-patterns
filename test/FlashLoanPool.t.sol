@@ -17,7 +17,7 @@ contract TestERC20 is ERC20 {
     }
 }
 
-contract FlashLoanValidator is StdAssertions {
+contract FlashLoanValidator is Test {
     struct Data {
         address expectedOperator;
         uint256 expectedAmount;
