@@ -21,8 +21,8 @@ contract Permit2Vault {
         _reentrancyGuard = false;
     }
 
-    // Deposit some amount of an ERC20 token into this contract
-    // using Permit2.
+    // Deposit some amount of an ERC20 token from the caller
+    // into this contract using Permit2.
     function depositERC20(
         IERC20 token,
         uint256 amount,
@@ -34,7 +34,7 @@ contract Permit2Vault {
         tokenBalancesByUser[msg.sender][token] += amount;
         // Transfer tokens from the caller to ourselves.
         PERMIT2.permitTransferFrom(
-            // The permit message.
+            // The permit message. Spender will be inferred as the caller (us).
             IPermit2.PermitTransferFrom({
                 permitted: IPermit2.TokenPermissions({
                     token: token,
@@ -58,12 +58,62 @@ contract Permit2Vault {
         );
     }
 
+    // Deposit multiple ERC20 tokens from the caller
+    // into this contract using Permit2.
+    function depositBatchERC20(
+        IERC20[] calldata tokens,
+        uint256[] calldata amounts,
+        uint256 nonce,
+        uint256 deadline,
+        bytes calldata signature
+    ) external nonReentrant {
+        require(tokens.length == amounts.length, 'array mismatch');
+        // The batch form of `permitTransferFrom()` takes an array of
+        // transfer details, which we will all direct to ourselves.
+        IPermit2.SignatureTransferDetails[] memory transferDetails =
+            new IPermit2.SignatureTransferDetails[](tokens.length);
+        // Credit the caller and populate the transferDetails.
+        for (uint256 i; i < tokens.length; ++i) {
+            tokenBalancesByUser[msg.sender][tokens[i]] += amounts[i];
+            transferDetails[i] = IPermit2.SignatureTransferDetails({
+                to: address(this),
+                requestedAmount: amounts[i]
+            });
+        }
+        PERMIT2.permitTransferFrom(
+            // The permit message. Spender will be inferred as the caller (us).
+            IPermit2.PermitBatchTransferFrom({
+                permitted: _toTokenPermissionsArray(tokens, amounts),
+                nonce: nonce,
+                deadline: deadline
+            }),
+            // The transfer recipients and amounts.
+            transferDetails,
+            // The owner of the tokens, which must also be
+            // the signer of the message, otherwise this call
+            // will fail.
+            msg.sender,
+            // The packed signature that was the result of signing
+            // the EIP712 hash of `permit`.
+            signature
+        );
+    }
+
     // Return ERC20 tokens deposited by the caller.
     function withdrawERC20(IERC20 token, uint256 amount) external nonReentrant {
         tokenBalancesByUser[msg.sender][token] -= amount;
         // TODO: In production, use an ERC20 compatibility library to
         // execute thie transfer to support non-compliant tokens.
         token.transfer(msg.sender, amount);
+    }
+
+    function _toTokenPermissionsArray(IERC20[] calldata tokens, uint256[] calldata amounts)
+        private pure returns (IPermit2.TokenPermissions[] memory permissions)
+    {
+        permissions = new IPermit2.TokenPermissions[](tokens.length);
+        for (uint256 i; i < permissions.length; ++i) {
+            permissions[i] = IPermit2.TokenPermissions({ token: tokens[i], amount: amounts[i] });
+        }
     }
 }
 
@@ -80,8 +130,18 @@ interface IPermit2 {
 
     // The permit2 message.
     struct PermitTransferFrom {
-        // Permitted token and amount.
-        TokenPermissions permitted;
+        // Permitted token and maximum amount.
+        TokenPermissions permitted;// deadline on the permit signature
+        // Unique identifier for this permit.
+        uint256 nonce;
+        // Expiration for this permit.
+        uint256 deadline;
+    }
+
+    // The permit2 message for batch transfers.
+    struct PermitBatchTransferFrom {
+        // Permitted tokens and maximum amounts.
+        TokenPermissions[] permitted;
         // Unique identifier for this permit.
         uint256 nonce;
         // Expiration for this permit.
@@ -100,6 +160,14 @@ interface IPermit2 {
     function permitTransferFrom(
         PermitTransferFrom calldata permit,
         SignatureTransferDetails calldata transferDetails,
+        address owner,
+        bytes calldata signature
+    ) external;
+
+    // Consume a batch permit2 message and transfer tokens.
+    function permitTransferFrom(
+        PermitBatchTransferFrom calldata permit,
+        SignatureTransferDetails[] calldata transferDetails,
         address owner,
         bytes calldata signature
     ) external;

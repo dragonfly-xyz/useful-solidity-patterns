@@ -45,18 +45,20 @@ Finally, let's dive into the Permit2 approach, which echoes elements from both p
 
 1. Alice calls `approve()` on an ERC20 to grant an infinite allowance to the canonical Permit2 contract.
 2. Alice signs an off-chain "permit2" message that signals that the protocol contract is allowed to *transfer* tokens on her behalf.
-3. Alice calls an interaction function on the protocol contract, passing in the signed permit2 message as a parameter.
+3. The next step will vary depending on UX choices:
+    1. In the simple case, Alice can just submit a transaction herself, including the signed permit2 message as part of an interaction with the protocol contract.
+    2. If the protocol contract allows it, Alice can transmit her signed permit2 message to a relayer service that will submit interaction the transaction on Alice's behalf.
 4. The protocol contract calls `permitTransferFrom()` on the Permit2 contract, which in turn uses its allowance (granted in 1.) to call `transferFrom()` on the ERC20 contract, moving the tokens held by Alice.
 
-It might seem like a regression to require the user to grant an explicit allowance first. But rather than granting it to the protocol directly, the user will instead grant it to the canonical Permit2 contract. This means that if the user has already done this before, say to interact with another protocol that integrated Permit2, every other protocol can skip that step! 🎉
+It might seem like a regression to require the user to grant an explicit allowance first. But rather than granting it to the protocol directly, the user will instead grant it to the canonical Permit2 contract. This means that if the user has already done this before, say to interact with another protocol that integrated Permit2, *every other protocol can skip that step*.
 
 Instead of directly calling `transferFrom()` on the ERC20 token to perform a transfer, a protocol will call `permitTransferFrom()` on the canonical Permit2 contract. Permit2 sits between the protocol and the ERC20 token, tracking and validating permit2 messages, then ultimately using its allowance to perform the `transferFrom()` call directly on the ERC20. This indirection is what allows Permit2 to extend EIP-2612-like benefits to every existing ERC20 token! 🎉
 
-Also, like EIP-2612 permit messages, permit2 messages expire to limit the the attack window of an exploit. 
+Also, like EIP-2612 permit messages, permit2 messages expire to limit the the attack window of an exploit. It's much also easier to secure the small Permit2 contract than the contracts of individual defi protocols, so having an infinite allowance there is less of a concern.
 
 ## Integrating Permit2
 
-For a frontend integrating Permit2, it will need to collect a user signature that will be passed into the transaction. The Permit2 message struct (`PermitTransferFrom`) signed by these signatures must comply with the [EIP-712](https://eips.ethereum.org/EIPS/eip-712) standard (for which [we have a general guide](../eip712-signed-messages/)), using the Permit2 domain and type hashes defined [here](https://github.com/Uniswap/permit2/blob/main/src/EIP712.sol) and [here](https://github.com/Uniswap/permit2/blob/main/src/libraries/PermitHash.sol). Be aware that the `spender` field for the EIP-712 Permit2 object needs to be set to the contract address that will be consuming it.
+For a frontend integrating Permit2, it will need to collect a user signature that will be passed into the transaction. The Permit2 message struct (`PermitTransferFrom`) signed by these signatures must comply with the [EIP-712](https://eips.ethereum.org/EIPS/eip-712) standard (for which [we have a general guide](../eip712-signed-messages/)), using the Permit2 domain and type hashes defined [here](https://github.com/Uniswap/permit2/blob/main/src/EIP712.sol) and [here](https://github.com/Uniswap/permit2/blob/main/src/libraries/PermitHash.sol). Be aware that the `spender` field for the EIP-712 Permit2 object needs to be set to the contract address that will be consuming it and directly calling the Permit2 contract functions.
 
 The smart contract integration is actually fairly easy! Any function that needs to move tokens held by a user just needs to accept any unknown permit message details and the corresponding EIP-712 user signature. To actually move the tokens, we will call `permitTransferFrom()` on the canonical Permit2 contract. That function is declared as:
 
@@ -76,23 +78,40 @@ The parameters for this function are:
         - `amount` - *Maximum* amount that can be transferred when consuming this permit.
     - `nonce` - A unique number, chosen by our app, to identify this permit. Once a permit is consumed, any other permit using that nonce will be invalid.
     - `deadline` - The latest possible block timestamp for when this permit is valid.
-- `transferDetails` - A struct containing the transfer recipient and transfer amount, which can be less than the amount the user signed for.
+- `transferDetails` - A struct detailing where permitted token should be transfered to and how much.
+    - `to` - Who receives the permitted token.
+    - `requestedAmount`: How much should be transferred. This can be less than the amount that the user signed in `permit.permitted`.
 -  `owner` - Who signed the permit and also holds the tokens. Often, in simple use-cases where the caller and the user are one and the same, this should be set to the caller (`msg.sender`). But in more exotic integrations, [you may need more sophisticated checks](https://docs.uniswap.org/contracts/permit2/reference/signature-transfer#security-considerations).
 - `signature` - The corresponding EIP-712 signature for the permit2 message, signed by `owner`. If the recovered address from signature verification does not match `owner`, the call will fail.
 
 > 🛈 Note that the `PermitTransferFrom` struct does not include the `spender` field found in the [EIP-712 typehash definition for the permit message](https://github.com/Uniswap/permit2/blob/main/src/libraries/PermitHash.sol#L21). It will be populated with our contract's address (the direct caller of `permitTransferFrom()`) during processing. This is why the `spender` field of the EIP-712 object the user signs must be the address of this contract.
 
+
+### Batch Transfers
+
+If you need to transfer multiple tokens, the good news is Permit2 also supports batch transfers via an overloaded implementation of `permitTransferFrom()`:
+
+```solidity
+function permitTransferFrom(
+        PermitBatchTransferFrom memory permit,
+        SignatureTransferDetails[] calldata transferDetails,
+        address owner,
+        bytes calldata signature
+    ) external;
+```
+
+ Instead of having the user sign a `PermitTransferFrom` message struct, you'll need the user to sign a `PermitBatchTransferFrom` message struct, inside which the `permitted` field is now an *array* of `TokenPermissions` structs instead of a single item. This version of `permitTransferFrom()` also accepts an array of `SignatureTransferDetails`, meaning each token permission can be directed towards different recipients.
+
 ### Advanced Integrations
 This guide covers the basic functionality offered by Permit2 but there's more you can do with it!
-- [Custom Witness Data](https://docs.uniswap.org/contracts/permit2/reference/signature-transfer#single-permitwitnesstransferfrom) - You can append custom data to the permit2 message, which means the Permit2 signature validation will extend to that data as well.
-- [Batch Transfers](https://docs.uniswap.org/contracts/permit2/reference/signature-transfer#batched-permittransferfrom) - A batched permit2 message for performing multiple transfers, secured by a single signature.
+- [Custom Witness Data](https://docs.uniswap.org/contracts/permit2/reference/signature-transfer#single-permitwitnesstransferfrom) - You can append custom data to the permit2 message, which means the Permit2 signature validation will extend to that data as well. Extremely useful to add validation to the rest of the interaction when employing the relayer approach.
 - [Smart Nonces](https://docs.uniswap.org/contracts/permit2/reference/signature-transfer#nonce-schema) - Under the hood, nonces are actually written as bit fields in an storage slot indexed by the upper 248 bits. You can save a signficant amount of gas by carefully choosing nonce values that reuse storage slots.
 - [Callback signatures](https://github.com/Uniswap/permit2/blob/main/src/libraries/SignatureVerification.sol#L43) - Permit2 supports [EIP-1271](https://eips.ethereum.org/EIPS/eip-1271) callback signatures, which allow smart contracts to also sign permit2 messages.
 - [Permit2 Allowances](https://docs.uniswap.org/contracts/permit2/reference/allowance-transfer) - For protocols that need more flexibility, Permit2 supports a more conventional allowance model that gets the added benefit of expiration times. 
 
 ## The Demo
 
-The provided [example code](./Permit2Vault.sol) is a simple vault that users can deposit ERC20 tokens into using Permit2, which they can later withdraw. Because it's multi-user, it needs to initiate the transfer in order to reliably credit which account owns which balance. Normally this requires granting an allowance to the vault contract and then having the vault perform the `transferFrom()` on the token itself, but Permit2 allows us to skip that hassle!
+The provided [example code](./Permit2Vault.sol) is a simple vault that users can deposit ERC20 tokens into using Permit2, which they can later withdraw. Because it's multi-user, it needs to initiate the transfer in order to reliably credit which account owns which balance. Normally this requires granting an allowance to the vault contract and then having the vault perform the `transferFrom()` on the token itself, but Permit2 allows us to skip that hassle! The demo provides examples for both single and batch transfers.
 
 The [tests](../../test/Permit2Vault.t.sol) deploy a local, bytecode fork of the mainnet Permit2 contract  to test an instance of the vault against. The EIP-712 hashing and signature generation is written in solidity/foundry as well, but should normally be performed off-chain at the frontend/backend level in your language of choice.
 
