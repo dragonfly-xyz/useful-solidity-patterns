@@ -3,7 +3,7 @@
 - [📜 Example Code](./TransferRelay.sol)
 - [🐞 Tests](../../test/TransferRelay.t.sol)
 
-What do filling a stop-loss order, executing a governance proposal, or meta transactions have in common? They're all operations meant to be consumed once and only once. You'll find these kinds of operations across many major protocols. This single-use guarantee needs to be enforced on-chain to prevent replay attacks. To do this, many protocols will derive some unique identifier (nonce) for the operation then map that identifier to a storage slot dedicated to that operation which holds a status flag indicating whether its been consumed or not.
+What do filling a stop-loss order, executing a governance proposal, or meta transactions have in common? They're all operations meant to be consumed once and only once. You'll find these kinds of operations across many major protocols. This single-use guarantee needs to be enforced on-chain to prevent replay attacks. To do this, many protocols will derive some unique identifier (nonce) for the operation then map that identifier to a storage slot dedicated to that operation which holds a status flag indicating whether it has been consumed or not.
 
 ## The Naive Approach
 
@@ -45,7 +45,7 @@ contract TransferRelay {
 }
 ```
 
-We expect the signer to choose a `nonce` value that is unique across all their messages. Our contract uses this `nonce` value to uniquely identify the message and record its status in the `isSignerNonceConsumed` mapping. Pretty straight-forward and intuitive... but we can do better!
+We expect the signer to choose a `nonce` value that is unique across all their messages. Our contract uses this `nonce` value to uniquely identify the message and record its status in the `isSignerNonceConsumed` mapping. Pretty straightforward and intuitive... but we can do better!
 
 ## Examining Gas costs
 
