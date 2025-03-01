@@ -116,6 +116,6 @@ The provided [example code](./Permit2Vault.sol) is a simple vault that users can
 The [tests](../../test/Permit2Vault.t.sol) deploy a local, bytecode fork of the mainnet Permit2 contract  to test an instance of the vault against. The EIP-712 hashing and signature generation is written in solidity/foundry as well, but should normally be performed off-chain at the frontend/backend level in your language of choice.
 
 ## Resources
-- [Permit2 Announcement](https://uniswap.org/blog/permit2-and-universal-router) - The canonical Permit2 address can also be found here.
+- [Permit2 Announcement](https://blog.uniswap.org/permit2-and-universal-router) - The canonical Permit2 address can also be found here.
 - [Permit2 Repo](https://github.com/Uniswap/permit2) - Permit2 Smart contracts
 - [Permit2 `SignatureTransfer` Docs](https://docs.uniswap.org/contracts/permit2/reference/signature-transfer) - Official Permit2 docs provided by Uniswap.
