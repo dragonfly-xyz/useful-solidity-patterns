@@ -124,7 +124,7 @@ This will trigger a popup for the user to sign the message `proposalId: YOUR_PRO
 Imagine signing an off-chain message for a protocol that signals you want to perform an action when certain on-chain conditions are met. This message can sit idly off-chain until those conditions are met then someone else can pass that message into the protocol to perform the on-chain action without your intervention. Because someone else submitted it, you never had to pay any gas.
 
 #### PRO: Often costs users less gas overall
-This pattern often goes hand-in-hand with [off-chain storage](./off-chain-storage), because all the fields in a message get condensed down into a single hash. Yet another bonus with signed messages is there is usually no need to even commit any data on-chain until the message is consumed. The message is considered trustworthy due to it being signed.
+This pattern often goes hand-in-hand with [off-chain storage](../off-chain-storage/), because all the fields in a message get condensed down into a single hash. Yet another bonus with signed messages is there is usually no need to even commit any data on-chain until the message is consumed. The message is considered trustworthy due to it being signed.
 
 #### PRO: Can batch actions from different users together
 Whoever executes the message can also batch it with other messages, performing all their actions in a single transaction.
