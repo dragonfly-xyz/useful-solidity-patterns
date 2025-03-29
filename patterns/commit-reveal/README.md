@@ -9,7 +9,7 @@ We could mitigate a lot of these issues if we somehow had a way to do things in 
 
 ### The Commit Transaction
 
-During the commit phase, a user first sends a "commit" transaction to the protocol, which binds them to performing a specific action later during the reveal phase. What constitutes a commitment is often just a single hash, which will be the hash of the action details and some large, random, user-chosen salt value (e.g., `commit = keccak256(ACTION, SALT)`). Because hashes are unique™ and non-reversible, without knowing the salt value it's practically impossible to discover which action was chosen to generate the commit hash.
+During the commit phase, a user first sends a "commit" transaction to the protocol, which binds them to perform a specific action later during the reveal phase. What constitutes a commitment is often just a single hash, which will be the hash of the action details and some large, random, user-chosen salt value (e.g., `commit = keccak256(ACTION, SALT)`). Because hashes are unique™ and non-reversible, without knowing the salt value it's practically impossible to discover which action was chosen to generate the commit hash.
 
 
 ### The Reveal Transaction

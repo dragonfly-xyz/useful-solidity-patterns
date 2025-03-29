@@ -9,7 +9,7 @@ The [EIP712 standard](https://eips.ethereum.org/EIPS/eip-712) defines a way for 
 
 ![metamask EIP712 popup](./metamask-721.png)
 
- The resulting signature serves as a sort of off-chain attestation by the signer. This signature can be shared off-chain then later consumed on-chain (usually by another party) to perform an action with the user's consent.
+ The resulting signature serves as a sort of off-chain attestation by the signer. This signature can be shared off-chain and then later consumed on-chain (usually by another party) to perform an action with the user's consent.
 
 ## Case Study: Voting
 
@@ -34,7 +34,7 @@ function voteFor(uint256 proposalId) external {
 
 With EIP712, we can let people vote without paying gas. Voters sign an off-chain vote message, indicating the proposal ID they want to vote yes for. Someone else can batch these individual signatures up and submit them all at once to be counted on-chain with the `voteForBySignatures()` function. This function accepts corresponding arrays of voters, proposal IDs, and signature components (which are returned by the wallet provider). It loops over each element, doing the following:
 
-1. Ensure that user hasn't already voted.
+1. Ensure that the user hasn't already voted.
 2. Compute the EIP712 type hash of the corresponding vote message (proposal ID).
 3. Check that the corresponding signature for that hash is signed by the voter, using the built-in `ecrecover()` precompile.
 4. Increase the votes for that proposal.
@@ -62,7 +62,7 @@ function voteForBySignatures(
 
 ### The EIP712 Type Hash
 
-The wallet provider (e.g., Metamask) will accept your message fields, condense it into a hash, then sign that hash with the user's private key. This hash must be computed in a specific way, according to the [EIP712 spec](https://eips.ethereum.org/EIPS/eip-712#specification) and ensures that messages from different protocols do not collide. Here we implement the `_getVoteHash()` function, used earlier, to compute the same hash on-chain.
+The wallet provider (e.g., Metamask) will accept your message fields, condense it into a hash, and then sign that hash with the user's private key. This hash must be computed in a specific way, according to the [EIP712 spec](https://eips.ethereum.org/EIPS/eip-712#specification) and ensures that messages from different protocols do not collide. Here we implement the `_getVoteHash()` function, used earlier, to compute the same hash on-chain.
 
 ```solidity
 function _getVoteHash(uint256 proposalId) private view returns (bytes32 hash) {
@@ -93,7 +93,7 @@ Note that `domainHash` and message's type hash never change, so you could (and s
 
 On the frontend side, our page needs to ask the connected wallet provider to generate a signature for a vote message. With ethers, we can use the [`Signer._signTypedData()`](https://docs.ethers.io/v5/single-page/#/v5/api/signer/-%23-Signer-signTypedData) method on a Signer instance for the active wallet. We need to pass in:
 
-1. A domain object, matching the fields used by the domain computation in `_getVoteHash()`.
+1. A domain object, matches the fields used by the domain computation in `_getVoteHash()`.
 2. A dictionary of EIP712 type definitions used by our message, with the last entry being our (root) message type. This matches the message type in `_getVoteHash()`.
 3. An object defining the values for each field in our message. In this case, we only have one field, `proposalId`.
 
@@ -133,10 +133,10 @@ Whoever executes the message can also batch it with other messages, performing a
 With off-chain messages, coordination and aggregation can be done off-chain and can leverage web2 hooks and data. Only the final settlement needs to happen on-chain.
 
 #### CON: Censorship risk
-Because signing a message doesn't mine a transaction, there is no on-chain record of it. The signature is typically shared between through traditional web2 channels, and often with a centralized component (a backend DB, for example). While no entity can forge a message signature on behalf of a user, they can choose not to share it with others. This creates a very real censorship risk.
+Because signing a message doesn't mine a transaction, there is no on-chain record of it. The signature is typically shared between traditional web2 channels, and often with a centralized component (a backend DB, for example). While no entity can forge a message signature on behalf of a user, they can choose not to share it with others. This creates a very real censorship risk.
 
 #### CON: Cancellations
-Once a message is signed, it cannot be un-signed. The only way to truly cancel a message is to do something on-chain. Typically protocols with cancel functions will simply mark the message hash as consumed/cancelled to prevent consuming it later. Another mitigation technique is to include an expiration field in the message, which is verified on-chain when consuming the message. It's cheaper to let short-lived messages expire and sign a new replacement than to a sign long-lived message and mine a cancellation transaction.
+Once a message is signed, it cannot be un-signed. The only way to truly cancel a message is to do something on-chain. Typically protocols with cancel functions will simply mark the message hash as consumed/canceled to prevent consuming it later. Another mitigation technique is to include an expiration field in the message, which is verified on-chain when consuming the message. It's cheaper to let short-lived messages expire and sign a new replacement than to a sign long-lived message and mine a cancellation transaction.
 
 #### CON: Allowances/Custody
 When working with assets from outside of a protocol, users typically either need to deposit or grant an allowance to the protocol. The signer will usually not be the one executing the action, so protocols need existing access to their assets in order to move them on their behalf.
@@ -157,7 +157,7 @@ This is a fairly common pattern, particularly in defi, but it's making its way i
 
 ## The Example
 
-The [provided demo](./MintVouchers.sol) is an ERC721 contract with restricted minting. The deployer can sign EIP712 messages (vouchers) defining a token ID and price that must be paid to mint it. Minters can redeem any of these vouchers and mint a token with the `mint()` command, so long as they also attach the correct amount of ETH. This also immediately pays the deployer the ETH attached. If the deployer changes their mind on a voucher which they've already distributed, they can call `cancel()` to prevent it from being used.
+The [provided demo](./MintVouchers.sol) is an ERC721 contract with restricted minting. The deployer can sign EIP712 messages (vouchers) defining a token ID and the price that must be paid to mint it. Minters can redeem any of these vouchers and mint a token with the `mint()` command, so long as they also attach the correct amount of ETH. This also immediately pays the deployer the ETH attached. If the deployer changes their mind on a voucher that they've already distributed, they can call `cancel()` to prevent it from being used.
 
 The demo has two parts: [the contract](./MintVouchers.sol) and the [frontend](https://codesandbox.io/s/compassionate-dust-jgeydc?file=/src/App.vue), which is hosted on CodeSandbox. The frontend has the pre-built contract artifact embedded as an asset. After you've connected the frontend to your Metamask, it will let you deploy the contract, sign new vouchers, and redeem those vouchers all from one page.
 

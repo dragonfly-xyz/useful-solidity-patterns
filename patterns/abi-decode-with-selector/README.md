@@ -22,7 +22,7 @@ The `abi.decode()` built-in function is the inverse of `abi.encode()`, taking ar
 
 But often when processing raw function calls and revert errors you first need to identify the function or revert error before assuming how the parameter data is encoded. That's why, for function calls and revert errors, the ABI-encoded parameters are also prefixed with a 4-byte "selector", identifying the function or revert error type. This is exactly what the `abi.encodeWithSelector()` and `abi.encodeCall()` built-ins do.
 
-There is no neat, built-in inverse function for `abi.encodeWithSelector()` because decoding this kind of data is actually a two-step process. But there is nothing stopping you from implementing it yourself, which is what we'll explore next.
+There is no neat, built-in inverse function for `abi.encodeWithSelector()` because decoding this kind of data is actually a two-step process. But nothing is stopping you from implementing it yourself, which is what we'll explore next.
 
 ## Case Study: Restricting approve() Calls
 
